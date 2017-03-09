@@ -63,6 +63,8 @@ class MapViewController: UIViewController
         let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(MapViewController.addPinToMap(_:)))
         longPressGesture.minimumPressDuration = 1
         mapView.addGestureRecognizer(longPressGesture)
+        
+        reloadPinsToMapView()
     }
     
     func alterMapHeight(_ buttonVisible: Bool)
@@ -85,6 +87,14 @@ class MapViewController: UIViewController
                 self.deleteButton.isHidden = !buttonVisible
             })
         }
+    }
+    
+    func createAlert(withTitle title:String, message:String)
+    {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        let action = UIAlertAction(title: "OK", style: .default, handler: nil)
+        alert.addAction(action)
+        present(alert, animated: true, completion: nil)
     }
     
     func setupDeleteButton() {
@@ -144,6 +154,31 @@ class MapViewController: UIViewController
                 
             default:
                 break
+        }
+    }
+    
+    func reloadPinsToMapView()
+    {
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "PinAnnotation")
+        
+        do
+        {
+            if let results = try CoreDataStack.sharedInstance.managedObjectContext.fetch(fetchRequest) as? [PinAnnotation]
+            {
+                for mapPin in results
+                {
+                    let pin = MyPinAnnotation()
+                    let latitude = mapPin.latitude
+                    let longitude = mapPin.longitude
+                    pin.coordinate = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+                    
+                    pin.pin = mapPin
+                    mapView.addAnnotation(pin)
+                }
+            }
+        }catch
+        {
+            createAlert(withTitle: "Query Error", message: "There was an error retrieving the pins from the database!")
         }
     }
 
