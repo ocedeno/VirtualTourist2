@@ -138,6 +138,16 @@ class PhotoViewController: UIViewController
         alert.addAction(action)
         present(alert, animated: true, completion: nil)
     }
+    
+    func removePhotosFromPin(_ indexPath:IndexPath)
+    {
+        handleManagedObjectContextOperations
+        { () -> Void in
+            let photo = self.fetchedResultsController.object(at: indexPath) as! Photo
+            self.sharedContext.delete(photo)
+            CoreDataStack.sharedInstance.saveMainContext()
+        }
+    }
 }
 
 extension PhotoViewController : UICollectionViewDelegate
