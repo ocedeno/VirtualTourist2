@@ -99,46 +99,51 @@ class MapViewController: UIViewController, MKMapViewDelegate
     }
     
     //MARK: Map Functions
-    func addPinToMap(_ longPressGesture:UILongPressGestureRecognizer) {
-        if isMapEditing {
+    func addPinToMap(_ longPressGesture:UILongPressGestureRecognizer)
+    {
+        if isMapEditing
+        {
             return
         }
         
-        switch longPressGesture.state {
-        case .began:
-            currentPin = MyPinAnnotation()
-            let touchCoord = longPressGesture.location(in: mapView)
-            currentPin!.coordinate = mapView.convert(touchCoord, toCoordinateFrom: mapView)
-            mapView.addAnnotation(currentPin!)
-            
-            break
-            
-        case .changed:
-            if let pin = currentPin {
+        switch longPressGesture.state
+        {
+            case .began:
+                currentPin = MyPinAnnotation()
                 let touchCoord = longPressGesture.location(in: mapView)
-                pin.coordinate = mapView.convert(touchCoord, toCoordinateFrom: mapView)
-            }
-            
-            break
-            
-        case .ended:
-            if let pin = self.currentPin {
-                let pinEntity = Pin(context: self.sharedContext)
-                pinEntity.latitude = Float(pin.coordinate.latitude) as NSNumber?
-                pinEntity.longitude = Float(pin.coordinate.longitude) as NSNumber?
-                pin.pin = pinEntity
+                currentPin!.coordinate = mapView.convert(touchCoord, toCoordinateFrom: mapView)
+                mapView.addAnnotation(currentPin!)
                 
-                //save the pin
-                CoreDataStack.sharedInstance.saveMainContext()
+                break
                 
-                //after the pin has been saved -- there is no longer a current pin
-                currentPin = nil
-            }
-            
-            break
-            
-        default:
-            break
+            case .changed:
+                if let pin = currentPin
+                {
+                    let touchCoord = longPressGesture.location(in: mapView)
+                    pin.coordinate = mapView.convert(touchCoord, toCoordinateFrom: mapView)
+                }
+                
+                break
+                
+            case .ended:
+                if let pin = self.currentPin
+                {
+                    let pinEntity = PinAnnotation(context: self.sharedContext)
+                    pinEntity.latitude = Double(pin.coordinate.latitude) as NSNumber?
+                    pinEntity.longitude = Double(pin.coordinate.longitude) as NSNumber?
+                    pin.pin = pinEntity
+                    
+                    //save the pin
+                    CoreDataStack.sharedInstance.saveMainContext()
+                    
+                    //after the pin has been saved -- there is no longer a current pin
+                    currentPin = nil
+                }
+                
+                break
+                
+            default:
+                break
         }
     }
 
