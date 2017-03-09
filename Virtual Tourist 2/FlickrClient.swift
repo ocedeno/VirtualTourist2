@@ -37,7 +37,7 @@ class FlickrClient
         static let MaxItemsPerPage = 16
     }
     
-    fileprivate func errorCheck(_ data: NSData?, response: URLResponse?, error: NSError?) -> NSError?
+    fileprivate func errorCheck(_ data: Data?, response: URLResponse?, error: NSError?) -> NSError?
     {
         func sendError(_ error: String) -> NSError
         {
@@ -149,5 +149,68 @@ class FlickrClient
         }
         
         task.resume()
+    }
+    
+    func getPhotosByLocation(using pin:PinAnnotation, completionHandler handler: @escaping (_ result: AnyObject?, _ error: NSError?) -> Void)
+    {
+        var parameters = [String:AnyObject]()
+        
+        //setup parameters for query
+        parameters["bbox"] = createBBox(pin.latitude, longitude: pin.longitude) as AnyObject?
+        parameters["safe_search"] = FlickrConstants.SafeSearch as AnyObject?
+        parameters["extras"] = FlickrConstants.extras as AnyObject?
+        parameters["api_key"] = FlickrConstants.APIKey as AnyObject?
+        parameters["method"] = FlickrConstants.ApiMethod as AnyObject?
+        parameters["format"] = FlickrConstants.format as AnyObject?
+        parameters["nojsoncallback"] = FlickrConstants.nojsoncallback as AnyObject?
+        parameters["per_page"] = UIConstants.MaxPhotoCount as AnyObject?
+        
+        getPhotoPageNumber(withParameters: parameters, pin: pin)
+        { (pages, error) in
+            
+            guard error == nil else
+            {
+                handler(nil, error)
+                return
+            }
+            
+            if let pageCount = pages
+            {
+                let limit = min(pageCount, UIConstants.MaxItemsPerPage)
+                let randomPage = Int(arc4random_uniform(UInt32(limit))) + 1
+                parameters["page"] = min(randomPage, UIConstants.MaxPageCount) as AnyObject?
+                
+                guard let request = self.urlFromParameters(parameters, query: nil, replaceQueryString: false) else
+                {
+                    let userInfo = [NSLocalizedDescriptionKey : "Could not generate request"]
+                    return handler(nil, NSError(domain: "createNSURLMutableRequest", code: -1, userInfo: userInfo))
+                }
+                
+                let task = self.session.dataTask(with: request as URLRequest)
+                { (data, response, error) in
+                    if let error = self.errorCheck(data, response: response, error: error as NSError?)
+                    {
+                        handler(nil, error)
+                    }else
+                    {
+                        var parsedResult: AnyObject!
+                        
+                        do
+                        {
+                            parsedResult = try JSONSerialization.jsonObject(with: data!, options: .allowFragments) as AnyObject
+                        }catch
+                        {
+                            let userInfo = [NSLocalizedDescriptionKey : "Could not parse the data as json"]
+                            handler(nil, NSError(domain: "convertDataWithCompletionHandler", code: -1, userInfo: userInfo))
+                        }
+                        
+                        handler(parsedResult, nil)
+                    }
+                }
+                
+                task.resume()
+            }
+        }
+
     }
 }
