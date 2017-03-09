@@ -22,6 +22,7 @@ class PhotoViewController: UIViewController
         }()
     
     fileprivate var selectedPhotos:[IndexPath]?
+    fileprivate var isFetching = false
     fileprivate var photosFilePath: String
     {
         return NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first!
@@ -68,7 +69,7 @@ class PhotoViewController: UIViewController
         noPhotosLabel.isHidden = true
         
         if (pin?.photos?.count)! <= 0 {
-            newCollection.isEnabled = false
+            newCollectionButton.isEnabled = false
             getPhotos()
         }
     }
@@ -148,6 +149,11 @@ class PhotoViewController: UIViewController
             CoreDataStack.sharedInstance.saveMainContext()
         }
     }
+    
+    @IBAction func newCollectionSelected(_ sender: UIBarButtonItem)
+    {
+        
+    }
 }
 
 extension PhotoViewController : UICollectionViewDelegate
@@ -163,7 +169,7 @@ extension PhotoViewController : UICollectionViewDelegate
         {
             cell.isSelected = true
             selectedPhotos?.append(indexPath)
-            newCollection.setTitle("Remove Selected Pictures", for: UIControlState())
+            newCollectionButton.setTitle("Remove Selected Pictures", for: UIControlState())
             configure(cell, forRowAtIndexPath: indexPath)
         }
     }
@@ -180,7 +186,7 @@ extension PhotoViewController : UICollectionViewDelegate
             
             if selectedPhotos?.count == 0
             {
-                newCollection.setTitle("New Collection", for: UIControlState())
+                newCollectionButton.title("New Collection", for: UIControlState())
             }
             
             configure(cell, forRowAtIndexPath: indexPath)
@@ -231,14 +237,14 @@ extension PhotoViewController : UICollectionViewDataSource
         
         let photo = fetchedResultsController.object(at: indexPath) as! Photo
         
-        let imageLocation = photo.imageLocation!
+        let imageLocation = photo.imageCoordinates!
         
         if FileManager.default.fileExists(atPath: URL(string: self.photosFilePath)!.appendingPathComponent(imageLocation).path) {
             cell.photoCellImageView.image = UIImage(contentsOfFile: URL(string: self.photosFilePath)!.appendingPathComponent(imageLocation).path)
-            cell.loadingView.isHidden = true
+            cell.photoCellLoadingView.isHidden = true
         } else {
             //if the file does not exist download it from the Internet and save it
-            if let imageURL = URL(string: photo.imageUrl) {
+            if let imageURL = URL(string: photo.imageURL) {
                 performDownloadsAndUpdateInBackground({ () -> Void in
                     if let imageData = try? Data(contentsOf: imageURL) {
                         //save file
@@ -246,7 +252,7 @@ extension PhotoViewController : UICollectionViewDataSource
                         
                         performUIUpdatesOnMain({ () -> Void in
                             cell.photoCellImageView.image = UIImage(data: imageData)
-                            cell.loadingView.isHidden = true
+                            cell.photoCellLoadingView.isHidden = true
                         })
                     }
                 })
@@ -261,7 +267,7 @@ extension PhotoViewController : NSFetchedResultsControllerDelegate {
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
         switch type {
         case .delete:
-            if isFetchingData {
+            if isFetching {
                 photoCollectionView.reloadData()
             }
             break
