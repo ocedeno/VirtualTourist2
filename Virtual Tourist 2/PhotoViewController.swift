@@ -56,7 +56,27 @@ class PhotoViewController: UIViewController
         selectedPhotos = [IndexPath]()
     }
     
+    override func viewWillAppear(_ animated: Bool)
+    {
+        super.viewWillAppear(animated)
+        
+        noPhotosLabel.isHidden = true
+        
+        if (pin?.photos?.count)! <= 0 {
+            newCollection.isEnabled = false
+            getPhotos()
+        }
+    }
     
+    override func viewWillLayoutSubviews()
+    {
+        super.viewWillLayoutSubviews()
+        
+        let width = view.frame.width / 3
+        let layout = photoCollectionView.collectionViewLayout as! UICollectionViewFlowLayout
+        layout.itemSize = CGSize(width: width - 1, height: width - 1)
+        
+    }
 }
 
 extension PhotoViewController : UICollectionViewDelegate
@@ -136,7 +156,7 @@ extension PhotoViewController : UICollectionViewDataSource
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "photoCell", for: indexPath) as! PhotoViewCell
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "photoCell", for: indexPath) as! PhotoCollectionViewCell
         
         let photo = fetchedResultsController.object(at: indexPath) as! Photo
         

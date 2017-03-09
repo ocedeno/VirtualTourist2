@@ -19,6 +19,6 @@ extension PinAnnotation
 
     @NSManaged public var latitude: Double
     @NSManaged public var longitude: Double
-    @NSManaged public var photos: Photo?
+    @NSManaged public var photos: NSSet?
 
 }
