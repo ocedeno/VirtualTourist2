@@ -13,7 +13,7 @@ class FlickrClient
     static let sharedClient: FlickrClient = FlickrClient()
     fileprivate var session = URLSession.shared
     
-    struct flickrConstants
+    struct FlickrConstants
     {
         static let ApiScheme = "https"
         static let ApiHost = "api.flickr.com"
@@ -24,10 +24,10 @@ class FlickrClient
         static let extras = "url_m,date_taken"
         static let format = "json"
         static let nojsoncallback = 1
-        static let SearchBBOXHalfWidth:Float = 0.01
-        static let SearchBBOXHalfHeight:Float = 0.01
-        static let SearchLatRange:(Float, Float) = (-90.0, 90.0)
-        static let SearchLonRange:(Float, Float) = (-180.0, 180.0)
+        static let SearchBBOXHalfWidth: Double = 0.01
+        static let SearchBBOXHalfHeight: Double = 0.01
+        static let SearchLatRange:(Double, Double) = (-90.0, 90.0)
+        static let SearchLonRange:(Double, Double) = (-180.0, 180.0)
     }
     
     struct UIConstants
@@ -70,9 +70,9 @@ class FlickrClient
     fileprivate func urlFromParameters(_ parameters: [String:AnyObject]?, query: String?, replaceQueryString: Bool) -> NSMutableURLRequest?
     {
         var components = URLComponents()
-        components.scheme = flickrConstants.ApiScheme
-        components.host = flickrConstants.ApiHost
-        components.path = flickrConstants.APIPath
+        components.scheme = FlickrConstants.ApiScheme
+        components.host = FlickrConstants.ApiHost
+        components.path = FlickrConstants.APIPath
         
         if let query = query
         {
@@ -101,5 +101,12 @@ class FlickrClient
         }
     }
     
-    
+    fileprivate func createBBox(_ latitude:Double, longitude:Double) -> String {
+        let minLon = max(longitude - FlickrConstants.SearchBBOXHalfWidth, FlickrConstants.SearchLonRange.0)
+        let maxLon = min(longitude + FlickrConstants.SearchBBOXHalfWidth, FlickrConstants.SearchLonRange.1)
+        let minLat = max(latitude - FlickrConstants.SearchBBOXHalfHeight, FlickrConstants.SearchLatRange.0)
+        let maxLat = min(latitude + FlickrConstants.SearchBBOXHalfHeight, FlickrConstants.SearchLatRange.1)
+        
+        return "\(minLon),\(minLat),\(maxLon),\(maxLat)"
+    }
 }
