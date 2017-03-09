@@ -36,7 +36,27 @@ class PhotoViewController: UIViewController
         photoCollectionView.delegate = self
         photoCollectionView.dataSource = self
         photoCollectionView.allowsMultipleSelection = true
+        
+        //set Region
+        if let pin = self.pin
+        {
+            let latitude = pin.latitude
+            let longitude = pin.longitude
+            let centerCoordinates = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+            let region = MKCoordinateRegion(center: centerCoordinates, span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05))
+            
+            mapView.setRegion(region, animated: true)
+            
+            let pinMarker = MKPointAnnotation()
+            pinMarker.coordinate = centerCoordinates
+            mapView.addAnnotation(pinMarker)
+        }
+        
+        loadFetchResultsController()
+        selectedPhotos = [IndexPath]()
     }
+    
+    
 }
 
 extension PhotoViewController : UICollectionViewDelegate
