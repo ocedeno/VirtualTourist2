@@ -145,6 +145,12 @@
                             <constraint firstItem="9RP-x2-1Fw" firstAttribute="leading" secondItem="izJ-2Y-tUh" secondAttribute="leading" id="ndv-yf-Olh"/>
                         </constraints>
                     </view>
+                    <connections>
+                        <outlet property="mapView" destination="djL-ln-y1H" id="MI3-hW-vKc"/>
+                        <outlet property="newCollectionButton" destination="Nz6-MW-DnT" id="LuY-z8-bhQ"/>
+                        <outlet property="noPhotosLabel" destination="6Se-41-LFQ" id="jSj-Zk-U5J"/>
+                        <outlet property="photoCollectionView" destination="L26-Ht-W0U" id="lzf-If-2jY"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="rHq-7c-m9f" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
