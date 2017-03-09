@@ -22,6 +22,11 @@ class MapViewController: UIViewController, MKMapViewDelegate
     var buttonHeight: CGFloat = 0.0
     var currentPin: PinAnnotation?
     
+    //MARK: - Shared Context
+    lazy var sharedContext: NSManagedObjectContext = {
+        CoreDataStack.sharedInstance.managedObjectContext
+    }()
+    
     var mapSettingPath: String
         {
             let manager = FileManager.default

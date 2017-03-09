@@ -13,6 +13,7 @@
 		06605CF91E719744006A0004 /* PinAnnotation+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06605CF51E719744006A0004 /* PinAnnotation+CoreDataProperties.swift */; };
 		06605CFB1E719866006A0004 /* PhotoCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06605CFA1E719866006A0004 /* PhotoCollectionViewCell.swift */; };
 		06605CFD1E719BC8006A0004 /* GCDBlackBox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06605CFC1E719BC8006A0004 /* GCDBlackBox.swift */; };
+		06605CFF1E71B11D006A0004 /* CoreDataStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06605CFE1E71B11D006A0004 /* CoreDataStack.swift */; };
 		06F214701E71839B00948792 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06F2146F1E71839B00948792 /* AppDelegate.swift */; };
 		06F214751E71839B00948792 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 06F214731E71839B00948792 /* Main.storyboard */; };
 		06F214771E71839B00948792 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 06F214761E71839B00948792 /* Assets.xcassets */; };
@@ -49,6 +50,7 @@
 		06605CF51E719744006A0004 /* PinAnnotation+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "PinAnnotation+CoreDataProperties.swift"; path = "../PinAnnotation+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		06605CFA1E719866006A0004 /* PhotoCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotoCollectionViewCell.swift; sourceTree = "<group>"; };
 		06605CFC1E719BC8006A0004 /* GCDBlackBox.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GCDBlackBox.swift; sourceTree = "<group>"; };
+		06605CFE1E71B11D006A0004 /* CoreDataStack.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataStack.swift; sourceTree = "<group>"; };
 		06F2146C1E71839B00948792 /* Virtual Tourist 2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Virtual Tourist 2.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		06F2146F1E71839B00948792 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		06F214741E71839B00948792 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -196,6 +198,7 @@
 			isa = PBXGroup;
 			children = (
 				06605CFC1E719BC8006A0004 /* GCDBlackBox.swift */,
+				06605CFE1E71B11D006A0004 /* CoreDataStack.swift */,
 			);
 			name = API;
 			sourceTree = "<group>";
@@ -340,6 +343,7 @@
 				06605CF71E719744006A0004 /* Photo+CoreDataProperties.swift in Sources */,
 				06605CFB1E719866006A0004 /* PhotoCollectionViewCell.swift in Sources */,
 				06605CF61E719744006A0004 /* Photo+CoreDataClass.swift in Sources */,
+				06605CFF1E71B11D006A0004 /* CoreDataStack.swift in Sources */,
 				06F214A81E71927900948792 /* MyPinAnnotation.swift in Sources */,
 				06605CFD1E719BC8006A0004 /* GCDBlackBox.swift in Sources */,
 				06F214AB1E71942E00948792 /* VirtualTouristModel.xcdatamodeld in Sources */,
