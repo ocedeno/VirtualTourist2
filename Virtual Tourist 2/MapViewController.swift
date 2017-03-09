@@ -69,6 +69,27 @@ class MapViewController: UIViewController
         reloadPinsToMapView()
     }
     
+    override func viewWillAppear(_ animated: Bool)
+    {
+        super.viewWillAppear(animated)
+        
+        //reposition map region and span
+        if let settingsDict = NSKeyedUnarchiver.unarchiveObject(withFile: mapSettingPath) as? [String:AnyObject]
+        {
+            let latitude = settingsDict["latitude"] as! CLLocationDegrees
+            let longitude = settingsDict["longitude"] as! CLLocationDegrees
+            let mapCenter = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+            
+            mapView.centerCoordinate = mapCenter
+            
+            let latDelta = (settingsDict["latitudeDelta"] as! CLLocationDegrees)
+            let longDelta = (settingsDict["longitudeDelta"] as! CLLocationDegrees)
+            let mapSpan = MKCoordinateSpan(latitudeDelta: latDelta, longitudeDelta: longDelta)
+            
+            mapView.region.span = mapSpan
+        }
+    }
+    
     func alterMapHeight(_ buttonVisible: Bool)
     {
         buttonHeight = buttonHeightConstant * view.bounds.maxY
@@ -159,7 +180,6 @@ class MapViewController: UIViewController
                     //after the pin has been saved -- there is no longer a current pin
                     currentPin = nil
                 }
-                
                 break
                 
             default:
