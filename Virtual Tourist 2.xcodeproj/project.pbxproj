@@ -115,11 +115,10 @@
 		06F2146E1E71839B00948792 /* Virtual Tourist 2 */ = {
 			isa = PBXGroup;
 			children = (
-				06F2146F1E71839B00948792 /* AppDelegate.swift */,
 				06F214A21E71840100948792 /* API */,
-				06F214A11E7183F100948792 /* Controller */,
-				06F214A01E7183ED00948792 /* View */,
 				06F2149F1E7183E800948792 /* Model */,
+				06F214A01E7183ED00948792 /* View */,
+				06F214A11E7183F100948792 /* Controller */,
 				06F2149D1E7183D500948792 /* Assets */,
 				06F2149E1E7183DF00948792 /* Supporting Files */,
 			);
@@ -157,6 +156,7 @@
 		06F2149E1E7183DF00948792 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				06F2146F1E71839B00948792 /* AppDelegate.swift */,
 				06F2147B1E71839B00948792 /* Info.plist */,
 			);
 			name = "Supporting Files";

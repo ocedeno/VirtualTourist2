@@ -7,6 +7,8 @@
 //
 
 import UIKit
+import MapKit
+import CoreData
 
 class PhotoViewController: UIViewController
 {
