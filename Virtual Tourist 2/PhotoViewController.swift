@@ -15,8 +15,13 @@ class PhotoViewController: UIViewController
     var pin: PinAnnotation!
     var photoURLs: [String:Date]?
     
+    //MARK: - Shared Context
+    lazy var sharedContext: NSManagedObjectContext =
+        {
+        CoreDataStack.sharedInstance.managedObjectContext
+        }()
+    
     fileprivate var selectedPhotos:[IndexPath]?
-    fileprivate var isFetchingData = false
     fileprivate var photosFilePath: String
     {
         return NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first!
@@ -68,6 +73,18 @@ class PhotoViewController: UIViewController
         }
     }
     
+    override func willAnimateRotation(to toInterfaceOrientation: UIInterfaceOrientation, duration: TimeInterval)
+    {
+        if let pin = pin
+        {
+            let latitude = pin.latitude
+            let longitude = pin.longitude
+            let center = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+            let region = MKCoordinateRegion(center: center, span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05))
+            mapView.setRegion(region, animated: true)
+        }
+    }
+    
     override func viewWillLayoutSubviews()
     {
         super.viewWillLayoutSubviews()
@@ -77,6 +94,29 @@ class PhotoViewController: UIViewController
         layout.itemSize = CGSize(width: width - 1, height: width - 1)
         
     }
+    
+    //MARK: NSFetchedResultsController
+    lazy var fetchedResultsController : NSFetchedResultsController<NSFetchRequestResult> =
+        {
+        //create the fetch request
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Photo")
+        
+        //add a sort descriptor, enforces a sort order on the results
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "dateTaken", ascending: false)]
+        
+        //add a predicate to only get photos for the specified pin
+        if let latitude = self.pin?.latitude, let longitude = self.pin?.longitude
+        {
+            let predicate = NSPredicate(format: "(pin.latitude == %@) AND (pin.longitude == %@)", latitude, longitude)
+            fetchRequest.predicate = predicate
+        }
+        
+        //create fetched results controller
+        let fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: self.sharedContext, sectionNameKeyPath: nil, cacheName: nil)
+        
+        return fetchedResultsController
+        
+        }()
 }
 
 extension PhotoViewController : UICollectionViewDelegate
