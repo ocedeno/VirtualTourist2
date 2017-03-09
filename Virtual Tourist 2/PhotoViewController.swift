@@ -154,6 +154,72 @@ class PhotoViewController: UIViewController
     {
         
     }
+    
+    //MARK: - Get Photos from Flickr
+    func getPhotos(fromCache cache:Bool = false)
+    {
+        FlickrClient.sharedClient.getPhotosByLocation(using: pin!)
+        { (result, error) -> Void in
+            
+            guard error == nil else
+            {
+                self.createAlert(withTitle: "Failed Query", message: "Could not retrieve images for this pin location")
+                return
+            }
+            
+            if let photos = result {
+                if let photosDict = photos["photos"] as? [String:AnyObject]
+                {
+                    if let photosDesc = photosDict["photo"] as? [[String:AnyObject]]
+                    {
+                        self.photoURLs = [String:Date]()
+                        let dateFormatter = DateFormatter()
+                        dateFormatter.dateFormat = "yyyy-MM-dd hh:mm:ss"
+                        for (_, photoItem) in photosDesc.enumerated()
+                        {
+                            if let photoURL = photoItem["url_m"] as? String, let dateTaken = photoItem["datetaken"] as? String
+                            {
+                                //photo urls of images to be downloaded
+                                self.photoURLs![photoURL] = dateFormatter.date(from: dateTaken)
+                            }
+                        }
+                        
+                        if self.photoURLs!.keys.count > 0
+                        {
+                            handleManagedObjectContextOperations({ () -> Void in
+                                for urlString in self.photoURLs!.keys
+                                {
+                                    if let photoFileName = urlString.components(separatedBy: "/").last
+                                    {
+                                        let photo = Photo(context: self.sharedContext)
+                                        photo.imageURL = urlString
+                                        photo.dateCreated = self.photoURLs![urlString]! as NSDate?
+                                        photo.pin = self.pin!
+                                        photo.imageCoordinates = photoFileName
+                                        CoreDataStack.sharedInstance.saveMainContext()
+                                    }
+                                }
+                                
+                                //performUIUpdatesOnMain({ () -> Void in
+                                self.photoCollectionView.isHidden = false
+                                self.newCollectionButton.isEnabled = true
+                                
+                            })
+                            
+                        } else {
+                            performUIUpdatesOnMain({ () -> Void in
+                                self.photoCollectionView.isHidden = true
+                                self.newCollectionButton.isEnabled = true
+                                self.noPhotosLabel.isHidden = false
+                                
+                            })
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 }
 
 extension PhotoViewController : UICollectionViewDelegate
@@ -169,7 +235,7 @@ extension PhotoViewController : UICollectionViewDelegate
         {
             cell.isSelected = true
             selectedPhotos?.append(indexPath)
-            newCollectionButton.setTitle("Remove Selected Pictures", for: UIControlState())
+            newCollectionButton.title = "Remove Selected Pictures"
             configure(cell, forRowAtIndexPath: indexPath)
         }
     }
@@ -186,7 +252,7 @@ extension PhotoViewController : UICollectionViewDelegate
             
             if selectedPhotos?.count == 0
             {
-                newCollectionButton.title("New Collection", for: UIControlState())
+                newCollectionButton.title = "New Collection"
             }
             
             configure(cell, forRowAtIndexPath: indexPath)
@@ -244,7 +310,7 @@ extension PhotoViewController : UICollectionViewDataSource
             cell.photoCellLoadingView.isHidden = true
         } else {
             //if the file does not exist download it from the Internet and save it
-            if let imageURL = URL(string: photo.imageURL) {
+            if let imageURL = URL(string: photo.imageURL!) {
                 performDownloadsAndUpdateInBackground({ () -> Void in
                     if let imageData = try? Data(contentsOf: imageURL) {
                         //save file
