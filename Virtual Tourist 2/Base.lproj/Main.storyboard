@@ -84,23 +84,23 @@
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <subviews>
                                                         <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="wYb-68-wQW" userLabel="Photo Cell Image View">
-                                                            <rect key="frame" x="8" y="8" width="98" height="90"/>
+                                                            <rect key="frame" x="0.0" y="0.0" width="114" height="106"/>
                                                         </imageView>
                                                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Isa-fQ-JTy" userLabel="Loading View">
-                                                            <rect key="frame" x="16" y="16" width="82" height="74"/>
-                                                            <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                                            <rect key="frame" x="8" y="8" width="98" height="90"/>
+                                                            <color key="backgroundColor" red="0.26866786617434235" green="0.83568061337405819" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                         </view>
                                                     </subviews>
                                                 </view>
                                                 <constraints>
-                                                    <constraint firstAttribute="trailingMargin" secondItem="wYb-68-wQW" secondAttribute="trailing" id="7t7-ma-hTZ"/>
-                                                    <constraint firstItem="Isa-fQ-JTy" firstAttribute="leading" secondItem="B6b-nN-Ov7" secondAttribute="leadingMargin" constant="8" id="9hP-Lj-JUb"/>
-                                                    <constraint firstItem="wYb-68-wQW" firstAttribute="leading" secondItem="B6b-nN-Ov7" secondAttribute="leadingMargin" id="L5O-MK-Vvs"/>
-                                                    <constraint firstItem="Isa-fQ-JTy" firstAttribute="top" secondItem="B6b-nN-Ov7" secondAttribute="topMargin" constant="8" id="UZb-tG-3rG"/>
-                                                    <constraint firstItem="wYb-68-wQW" firstAttribute="top" secondItem="B6b-nN-Ov7" secondAttribute="topMargin" id="nds-0F-btj"/>
-                                                    <constraint firstAttribute="trailingMargin" secondItem="Isa-fQ-JTy" secondAttribute="trailing" constant="8" id="scE-Pr-cf7"/>
-                                                    <constraint firstAttribute="bottomMargin" secondItem="Isa-fQ-JTy" secondAttribute="bottom" constant="8" id="tVy-ea-JFF"/>
-                                                    <constraint firstAttribute="bottomMargin" secondItem="wYb-68-wQW" secondAttribute="bottom" id="xKo-ac-AP5"/>
+                                                    <constraint firstAttribute="trailingMargin" secondItem="wYb-68-wQW" secondAttribute="trailing" constant="-8" id="7t7-ma-hTZ"/>
+                                                    <constraint firstItem="Isa-fQ-JTy" firstAttribute="leading" secondItem="B6b-nN-Ov7" secondAttribute="leadingMargin" id="9hP-Lj-JUb"/>
+                                                    <constraint firstItem="wYb-68-wQW" firstAttribute="leading" secondItem="B6b-nN-Ov7" secondAttribute="leadingMargin" constant="-8" id="L5O-MK-Vvs"/>
+                                                    <constraint firstItem="Isa-fQ-JTy" firstAttribute="top" secondItem="B6b-nN-Ov7" secondAttribute="topMargin" id="UZb-tG-3rG"/>
+                                                    <constraint firstItem="wYb-68-wQW" firstAttribute="top" secondItem="B6b-nN-Ov7" secondAttribute="topMargin" constant="-8" id="nds-0F-btj"/>
+                                                    <constraint firstAttribute="trailingMargin" secondItem="Isa-fQ-JTy" secondAttribute="trailing" id="scE-Pr-cf7"/>
+                                                    <constraint firstAttribute="bottomMargin" secondItem="Isa-fQ-JTy" secondAttribute="bottom" id="tVy-ea-JFF"/>
+                                                    <constraint firstAttribute="bottomMargin" secondItem="wYb-68-wQW" secondAttribute="bottom" constant="-8" id="xKo-ac-AP5"/>
                                                 </constraints>
                                             </collectionViewCell>
                                         </cells>
