@@ -8,14 +8,14 @@
 
 import MapKit
 
-class PinAnnotation: MKPointAnnotation
+class MyPinAnnotation: MKPointAnnotation
 {
     override init()
     {
         super.init()
     }
     
-    init(withPinAnnotation pin:Pin)
+    init(withPinAnnotation pin:PinAnnotation)
     {
         super.init()
         
