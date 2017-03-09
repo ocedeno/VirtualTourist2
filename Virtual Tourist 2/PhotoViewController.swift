@@ -57,7 +57,7 @@ class PhotoViewController: UIViewController
             mapView.addAnnotation(pinMarker)
         }
         
-        loadFetchResultsController()
+        loadFetchedResultsController()
         selectedPhotos = [IndexPath]()
     }
     
@@ -117,6 +117,27 @@ class PhotoViewController: UIViewController
         return fetchedResultsController
         
         }()
+    
+    func loadFetchedResultsController()
+    {
+        fetchedResultsController.delegate = self
+        
+        //get results from the fetchedResultsController
+        do {
+            try self.fetchedResultsController.performFetch()
+        } catch {
+            let fetchError = error as NSError
+            print("\(fetchError), \(fetchError.userInfo)")
+            self.createAlert(withTitle: "Failed Query", message: "Failed to load photos")
+        }
+    }
+    
+    func createAlert(withTitle title:String, message:String) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        let action = UIAlertAction(title: "OK", style: .default, handler: nil)
+        alert.addAction(action)
+        present(alert, animated: true, completion: nil)
+    }
 }
 
 extension PhotoViewController : UICollectionViewDelegate
