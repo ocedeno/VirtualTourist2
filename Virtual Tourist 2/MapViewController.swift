@@ -17,10 +17,10 @@ class MapViewController: UIViewController
     @IBOutlet weak var editButton: UIBarButtonItem!
     
     var mapSettings =  [String:AnyObject]()
-    var deleteButton:UIButton!
+    var deleteButton: UIButton!
     var isMapEditing = false
-    var buttonHeight:CGFloat = 0.0
-    var currentPin:PinAnnotation?
+    var buttonHeight: CGFloat = 0.0
+    var currentPin: PinAnnotation?
     
     var mapSettingPath: String
         {
@@ -33,9 +33,44 @@ class MapViewController: UIViewController
     //percentage of height for delete button in any orientation
     var buttonHeightConstant:CGFloat = 0.096
     
-    @IBOutlet weak var editButtonSelected: UIBarButtonItem!
+    @IBAction func editButtonSelected(_ sender: UIBarButtonItem)
+    {
+        isMapEditing = !isMapEditing
+        
+        if isMapEditing
+        {
+            editButton.title = "Done"
+            alterMapHeight(true)
+        }else
+        {
+            editButton.title = "Edit"
+            alterMapHeight(false)
+        }
+    }
     override func viewDidLoad()
     {
         super.viewDidLoad()
+    }
+    
+    func alterMapHeight(_ buttonVisible: Bool)
+    {
+        buttonHeight = buttonHeightConstant * view.bounds.maxY
+        
+        if buttonVisible {
+            deleteButton.isHidden = !buttonVisible
+            
+            UIView.animate(withDuration: 0.7, animations: { () -> Void in
+                self.mapView.frame.origin.y -= self.buttonHeight
+                self.deleteButton.frame.origin.y -=  self.buttonHeight
+            })
+            
+        } else {
+            UIView.animate(withDuration: 0.7, animations: { () -> Void in
+                self.mapView.frame.origin.y = 0
+                self.deleteButton.frame.origin.y = self.view.bounds.maxY
+            }, completion: { (complete) -> Void in
+                self.deleteButton.isHidden = !buttonVisible
+            })
+        }
     }
 }

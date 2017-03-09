@@ -35,11 +35,14 @@
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="Virtual Tourist" id="sTP-zp-P7j">
-                        <barButtonItem key="rightBarButtonItem" title="Edit" id="3p7-Wg-cYO" userLabel="Edit Bar Button"/>
+                        <barButtonItem key="rightBarButtonItem" title="Edit" id="3p7-Wg-cYO" userLabel="Edit Bar Button">
+                            <connections>
+                                <action selector="editButtonSelected:" destination="BYZ-38-t0r" id="3f2-bh-qQz"/>
+                            </connections>
+                        </barButtonItem>
                     </navigationItem>
                     <connections>
                         <outlet property="editButton" destination="3p7-Wg-cYO" id="d62-dZ-obe"/>
-                        <outlet property="editButtonSelected" destination="3p7-Wg-cYO" id="MRk-2S-Xi0"/>
                         <outlet property="mapView" destination="Wsp-fD-Ca4" id="3dK-G1-GAt"/>
                         <segue destination="3k2-nR-8tQ" kind="show" identifier="getPhotosSegue" id="EdI-q9-cwv"/>
                     </connections>
