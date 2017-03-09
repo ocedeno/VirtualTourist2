@@ -121,7 +121,7 @@ class FlickrClient
         
         let task = session.dataTask(with: request as URLRequest)
         { (data, response, error) in
-            if let error = self.errorCheck(data as NSData?, response: response, error: error as NSError?)
+            if let error = self.errorCheck(data as Data?, response: response, error: error as NSError?)
             {
                 handler(nil, error)
             } else
