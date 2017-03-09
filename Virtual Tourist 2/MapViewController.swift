@@ -129,8 +129,8 @@ class MapViewController: UIViewController, MKMapViewDelegate
                 if let pin = self.currentPin
                 {
                     let pinEntity = PinAnnotation(context: self.sharedContext)
-                    pinEntity.latitude = Double(pin.coordinate.latitude) as NSNumber?
-                    pinEntity.longitude = Double(pin.coordinate.longitude) as NSNumber?
+                    pinEntity.latitude = pin.coordinate.latitude 
+                    pinEntity.longitude = pin.coordinate.longitude
                     pin.pin = pinEntity
                     
                     //save the pin
