@@ -10,10 +10,10 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--Virtual Tourist-->
+        <!--MapViewController-->
         <scene sceneID="tne-QT-ifu">
             <objects>
-                <viewController id="BYZ-38-t0r" customClass="ViewController" customModule="Virtual_Tourist_2" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="MapViewController" useStoryboardIdentifierAsRestorationIdentifier="YES" id="BYZ-38-t0r" userLabel="MapViewController" customClass="MapViewController" customModule="Virtual_Tourist_2" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="y3c-jy-aDJ"/>
                         <viewControllerLayoutGuide type="bottom" id="wfy-db-euE"/>
@@ -45,10 +45,10 @@
             </objects>
             <point key="canvasLocation" x="1076" y="138.98050974512745"/>
         </scene>
-        <!--View Controller-->
+        <!--PhotoViewController-->
         <scene sceneID="E33-dk-UW4">
             <objects>
-                <viewController id="3k2-nR-8tQ" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="PhotoViewController" useStoryboardIdentifierAsRestorationIdentifier="YES" id="3k2-nR-8tQ" userLabel="PhotoViewController" customClass="PhotoViewController" customModule="Virtual_Tourist_2" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="tF3-DX-5Z2"/>
                         <viewControllerLayoutGuide type="bottom" id="wBj-BA-jiN"/>
@@ -76,7 +76,7 @@
                                             <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
                                         </collectionViewFlowLayout>
                                         <cells>
-                                            <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="photoCell" id="B6b-nN-Ov7" userLabel="photoCell">
+                                            <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="photoCell" id="B6b-nN-Ov7" userLabel="photoCell" customClass="PhotoCollectionViewCell" customModule="Virtual_Tourist_2" customModuleProvider="target">
                                                 <rect key="frame" x="0.0" y="0.0" width="114" height="106"/>
                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                 <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
@@ -102,6 +102,10 @@
                                                     <constraint firstAttribute="bottomMargin" secondItem="Isa-fQ-JTy" secondAttribute="bottom" id="tVy-ea-JFF"/>
                                                     <constraint firstAttribute="bottomMargin" secondItem="wYb-68-wQW" secondAttribute="bottom" constant="-8" id="xKo-ac-AP5"/>
                                                 </constraints>
+                                                <connections>
+                                                    <outlet property="photoCellImageView" destination="wYb-68-wQW" id="YSf-W7-XM1"/>
+                                                    <outlet property="photoCellLoadingView" destination="Isa-fQ-JTy" id="DUL-OO-ztE"/>
+                                                </connections>
                                             </collectionViewCell>
                                         </cells>
                                     </collectionView>
