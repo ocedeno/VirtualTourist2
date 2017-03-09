@@ -66,4 +66,40 @@ class FlickrClient
         
         return nil
     }
+    
+    fileprivate func urlFromParameters(_ parameters: [String:AnyObject]?, query: String?, replaceQueryString: Bool) -> NSMutableURLRequest?
+    {
+        var components = URLComponents()
+        components.scheme = flickrConstants.ApiScheme
+        components.host = flickrConstants.ApiHost
+        components.path = flickrConstants.APIPath
+        
+        if let query = query
+        {
+            components.query = query
+        }
+        
+        if let parameters = parameters
+        {
+            var queryItems = [URLQueryItem]()
+            
+            for (key,value) in parameters
+            {
+                let queryItem = URLQueryItem(name: key, value: "\(value)")
+                queryItems.append(queryItem)
+            }
+            
+            components.queryItems = queryItems
+        }
+        
+        if let url = components.url
+        {
+            return NSMutableURLRequest(url: url)
+        }else
+        {
+            return nil
+        }
+    }
+    
+    
 }
