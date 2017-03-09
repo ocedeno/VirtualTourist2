@@ -12,7 +12,7 @@ import CoreData
 
 class PhotoViewController: UIViewController
 {
-    var pin: PinAnnotation!
+    var pin: PinAnnotation?
     var photoURLs: [String:Date]?
     
     //MARK: - Shared Context
@@ -103,7 +103,7 @@ class PhotoViewController: UIViewController
         let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Photo")
         
         //add a sort descriptor, enforces a sort order on the results
-        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "dateTaken", ascending: false)]
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "dateCreated", ascending: false)]
         
         //add a predicate to only get photos for the specified pin
         if let latitude = self.pin?.latitude, let longitude = self.pin?.longitude
@@ -152,7 +152,37 @@ class PhotoViewController: UIViewController
     
     @IBAction func newCollectionSelected(_ sender: UIBarButtonItem)
     {
-        
+        if (selectedPhotos?.count)! > 0 {
+            photoCollectionView.performBatchUpdates({ () -> Void in
+                for indexPath in (self.selectedPhotos?.sorted(by: { $0.item > $1.item}))! {
+                    self.removePhotosFromPin(indexPath)
+                }
+                
+            }, completion: { (completed) -> Void in
+                performUIUpdatesOnMain({ () -> Void in
+                    self.photoCollectionView.deleteItems(at: self.selectedPhotos!)
+                    self.selectedPhotos?.removeAll()
+                    self.newCollectionButton.title = "New Collection"
+                })
+            })
+        } else {
+            newCollectionButton.isEnabled = false
+            
+            photoCollectionView.performBatchUpdates({ () -> Void in
+                if let pin = self.pin, let _ = pin.photos {
+                    self.isFetching = true
+                    for photo in self.fetchedResultsController.fetchedObjects as! [Photo] {
+                        self.sharedContext.delete(photo)
+                    }
+                    
+                    CoreDataStack.sharedInstance.saveMainContext()
+                    
+                }
+            }, completion: { (completed) -> Void in
+                self.isFetching = false
+                self.getPhotos()
+            })
+        }
     }
     
     //MARK: - Get Photos from Flickr
