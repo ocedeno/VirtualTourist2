@@ -10,7 +10,7 @@ import UIKit
 import MapKit
 import CoreData
 
-class MapViewController: UIViewController
+class MapViewController: UIViewController, MKMapViewDelegate
 {
 
     @IBOutlet weak var mapView: MKMapView!
@@ -50,6 +50,9 @@ class MapViewController: UIViewController
     override func viewDidLoad()
     {
         super.viewDidLoad()
+        
+        mapView.delegate = self
+        setupDeleteButton()
     }
     
     func alterMapHeight(_ buttonVisible: Bool)
@@ -72,5 +75,16 @@ class MapViewController: UIViewController
                 self.deleteButton.isHidden = !buttonVisible
             })
         }
+    }
+    
+    func setupDeleteButton() {
+        deleteButton = UIButton()
+        deleteButton.isHidden = true
+        buttonHeight = buttonHeightConstant * view.bounds.maxY
+        deleteButton.frame = CGRect(x: 0, y: view.bounds.maxY, width: view.bounds.size.width, height: buttonHeightConstant * view.bounds.maxY)
+        deleteButton.backgroundColor = UIColor.red
+        deleteButton.setTitle("Tap Pins to Delete!", for: UIControlState())
+        
+        view.addSubview(deleteButton)
     }
 }
