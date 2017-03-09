@@ -12,6 +12,7 @@ import CoreData
 
 class PhotoViewController: UIViewController
 {
+    var pin: PinAnnotation!
     override func viewDidLoad()
     {
         super.viewDidLoad()

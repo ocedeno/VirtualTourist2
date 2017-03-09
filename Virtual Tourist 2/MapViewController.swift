@@ -23,9 +23,10 @@ class MapViewController: UIViewController
     var currentPin: MyPinAnnotation?
     
     //MARK: - Shared Context
-    lazy var sharedContext: NSManagedObjectContext = {
+    lazy var sharedContext: NSManagedObjectContext =
+        {
         CoreDataStack.sharedInstance.managedObjectContext
-    }()
+        }()
     
     var mapSettingPath: String
         {
@@ -52,6 +53,7 @@ class MapViewController: UIViewController
             alterMapHeight(false)
         }
     }
+    
     override func viewDidLoad()
     {
         super.viewDidLoad()
@@ -97,13 +99,15 @@ class MapViewController: UIViewController
         present(alert, animated: true, completion: nil)
     }
     
-    override func willAnimateRotation(to toInterfaceOrientation: UIInterfaceOrientation, duration: TimeInterval) {
+    override func willAnimateRotation(to toInterfaceOrientation: UIInterfaceOrientation, duration: TimeInterval)
+    {
         buttonHeight = buttonHeightConstant * view.bounds.maxY
         let buttonOriginY = (deleteButton.isHidden) ? view.bounds.maxY : view.bounds.maxY - buttonHeight
         deleteButton.frame = CGRect(x: 0, y: buttonOriginY, width: view.bounds.size.width, height: buttonHeight)
     }
     
-    func setupDeleteButton() {
+    func setupDeleteButton()
+    {
         deleteButton = UIButton()
         deleteButton.isHidden = true
         buttonHeight = buttonHeightConstant * view.bounds.maxY
@@ -185,6 +189,18 @@ class MapViewController: UIViewController
         }catch
         {
             createAlert(withTitle: "Query Error", message: "There was an error retrieving the pins from the database!")
+        }
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "getPhotosSegue" {
+            let destination = segue.destination as! PhotoViewController
+            let annotation = sender as! MyPinAnnotation
+            
+            if let pin = annotation.pin {
+                destination.pin = pin
+                mapView.deselectAnnotation(annotation, animated: true)
+            }
         }
     }
 
