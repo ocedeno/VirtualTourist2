@@ -109,4 +109,45 @@ class FlickrClient
         
         return "\(minLon),\(minLat),\(maxLon),\(maxLat)"
     }
+    
+    fileprivate func getPhotoPageNumber(withParameters parameters:[String:AnyObject], pin:PinAnnotation, completionHandler handler: @escaping (_ page: Int?, _ error: NSError?)-> Void)
+    {
+        guard let request = urlFromParameters(parameters, query: nil, replaceQueryString: false) else
+        {
+            let userInfo = [NSLocalizedDescriptionKey : "Could not generate request"]
+            handler(nil, NSError(domain: "getPhotoPageNumber", code: -1, userInfo: userInfo))
+            return
+        }
+        
+        let task = session.dataTask(with: request as URLRequest)
+        { (data, response, error) in
+            if let error = self.errorCheck(data as NSData?, response: response, error: error as NSError?)
+            {
+                handler(nil, error)
+            } else
+            {
+                var parsedResult: AnyObject!
+                
+                do {
+                    parsedResult = try JSONSerialization.jsonObject(with: data!, options: .allowFragments) as AnyObject
+                } catch {
+                    let userInfo = [NSLocalizedDescriptionKey : "Could not parse the data as json"]
+                    handler(nil, NSError(domain: "getPhotoPageNumber", code: -1, userInfo: userInfo))
+                }
+                
+                if let photos = parsedResult
+                {
+                    if let photosDict = photos["photos"] as? [String:AnyObject]
+                    {
+                        if let pageNumber = photosDict["pages"] as? Int
+                        {
+                            handler(pageNumber, nil)
+                        }
+                    }
+                }
+            }
+        }
+        
+        task.resume()
+    }
 }
