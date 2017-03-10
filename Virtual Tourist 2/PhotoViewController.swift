@@ -332,7 +332,7 @@ extension PhotoViewController : UICollectionViewDataSource
         } else {
             return 0
         }
-    } 
+    }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell
     {
