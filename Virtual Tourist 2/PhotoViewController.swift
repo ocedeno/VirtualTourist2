@@ -84,10 +84,9 @@ class PhotoViewController: UIViewController
     {
         super.viewWillLayoutSubviews()
         
-        let width = view.frame.width / 3
+        let width = view.frame.width / 4
         let layout = photoCollectionView.collectionViewLayout as! UICollectionViewFlowLayout
-        layout.itemSize = CGSize(width: width - 1, height: width - 1)
-        
+        layout.itemSize = CGSize(width: width + 1, height: width + 1)
     }
     
     //MARK: - Shared Context
@@ -316,34 +315,36 @@ extension PhotoViewController : UICollectionViewDataSource
         return cell
     }
     
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        if let sectionInfo = fetchedResultsController.sections {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int
+    {
+        if let sectionInfo = fetchedResultsController.sections
+        {
             return sectionInfo[section].numberOfObjects
         } else {
             return 0
         }
     }
     
-    func numberOfSections(in collectionView: UICollectionView) -> Int {
-        
-        return 1
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell
+    {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "photoCell", for: indexPath) as! PhotoCollectionViewCell
         
         let photo = fetchedResultsController.object(at: indexPath) as! Photo
         
         let imageLocation = photo.imageCoordinates!
         
-        if FileManager.default.fileExists(atPath: URL(string: self.photosFilePath)!.appendingPathComponent(imageLocation).path) {
+        if FileManager.default.fileExists(atPath: URL(string: self.photosFilePath)!.appendingPathComponent(imageLocation).path)
+        {
             cell.photoCellImageView.image = UIImage(contentsOfFile: URL(string: self.photosFilePath)!.appendingPathComponent(imageLocation).path)
             cell.photoCellLoadingView.isHidden = true
-        } else {
+        } else
+        {
             //if the file does not exist download it from the Internet and save it
-            if let imageURL = URL(string: photo.imageURL!) {
+            if let imageURL = URL(string: photo.imageURL!)
+            {
                 performDownloadsAndUpdateInBackground({ () -> Void in
-                    if let imageData = try? Data(contentsOf: imageURL) {
+                    if let imageData = try? Data(contentsOf: imageURL)
+                    {
                         //save file
                         try? imageData.write(to: URL(fileURLWithPath: URL(string: self.photosFilePath)!.appendingPathComponent(imageURL.lastPathComponent).path), options: [.atomic])
                         
