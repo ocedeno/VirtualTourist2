@@ -17,8 +17,8 @@ extension PinAnnotation
         return NSFetchRequest<PinAnnotation>(entityName: "PinAnnotation");
     }
 
-    @NSManaged public var latitude: Float
-    @NSManaged public var longitude: Float
+    @NSManaged public var latitude: NSNumber
+    @NSManaged public var longitude: NSNumber
     @NSManaged public var photos: NSSet?
 
 }

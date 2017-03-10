@@ -170,8 +170,8 @@ class MapViewController: UIViewController
                 if let pin = self.currentPin
                 {
                     let pinEntity = PinAnnotation(context: self.sharedContext)
-                    pinEntity.latitude = Float(pin.coordinate.latitude) 
-                    pinEntity.longitude = Float(pin.coordinate.longitude)
+                    pinEntity.latitude = (Float(pin.coordinate.latitude) as NSNumber?)!
+                    pinEntity.longitude = (Float(pin.coordinate.longitude) as NSNumber?)!
                     pin.pin = pinEntity
                     
                     //save the pin

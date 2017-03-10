@@ -72,8 +72,8 @@ class PhotoViewController: UIViewController
     {
         if let pin = pin
         {
-            let latitude = pin.latitude as! CLLocationDegrees
-            let longitude = pin.longitude as! CLLocationDegrees
+            let latitude = pin.latitude as CLLocationDegrees
+            let longitude = pin.longitude as CLLocationDegrees
             let center = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
             let region = MKCoordinateRegion(center: center, span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05))
             mapView.setRegion(region, animated: true)
@@ -267,7 +267,7 @@ extension PhotoViewController : UICollectionViewDelegate
             cell.isSelected = true
             selectedPhotos?.append(indexPath)
             newCollectionButton.title = "Remove Selected Pictures"
-            configure(cell, forRowAtIndexPath: indexPath)
+            let _ = configure(cell, forRowAtIndexPath: indexPath)
         }
     }
     
@@ -286,7 +286,7 @@ extension PhotoViewController : UICollectionViewDelegate
                 newCollectionButton.title = "New Collection"
             }
             
-            configure(cell, forRowAtIndexPath: indexPath)
+            let _ = configure(cell, forRowAtIndexPath: indexPath)
         }
     }
 }
