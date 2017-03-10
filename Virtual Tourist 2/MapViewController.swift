@@ -63,7 +63,7 @@ class MapViewController: UIViewController
         
         //add long press gesture for pins
         let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(MapViewController.addPinToMap(_:)))
-        longPressGesture.minimumPressDuration = 1
+        longPressGesture.minimumPressDuration = 0.5
         mapView.addGestureRecognizer(longPressGesture)
         
         reloadPinsToMapView()
