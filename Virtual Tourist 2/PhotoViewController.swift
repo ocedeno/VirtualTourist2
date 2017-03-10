@@ -15,12 +15,6 @@ class PhotoViewController: UIViewController
     var pin: PinAnnotation?
     var photoURLs: [String:Date]?
     
-    //MARK: - Shared Context
-    lazy var sharedContext: NSManagedObjectContext =
-        {
-        CoreDataStack.sharedInstance.managedObjectContext
-        }()
-    
     fileprivate var selectedPhotos:[IndexPath]?
     fileprivate var isFetching = false
     fileprivate var photosFilePath: String
@@ -48,7 +42,7 @@ class PhotoViewController: UIViewController
         {
             let latitude = pin.latitude
             let longitude = pin.longitude
-            let centerCoordinates = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+            let centerCoordinates = CLLocationCoordinate2D(latitude: CLLocationDegrees(latitude), longitude: CLLocationDegrees(longitude))
             let region = MKCoordinateRegion(center: centerCoordinates, span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05))
             
             mapView.setRegion(region, animated: true)
@@ -80,7 +74,7 @@ class PhotoViewController: UIViewController
         {
             let latitude = pin.latitude
             let longitude = pin.longitude
-            let center = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+            let center = CLLocationCoordinate2D(latitude: CLLocationDegrees(latitude), longitude: CLLocationDegrees(longitude))
             let region = MKCoordinateRegion(center: center, span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05))
             mapView.setRegion(region, animated: true)
         }
@@ -96,28 +90,35 @@ class PhotoViewController: UIViewController
         
     }
     
+    //MARK: - Shared Context
+    lazy var sharedContext: NSManagedObjectContext =
+        {
+            CoreDataStack.sharedInstance.managedObjectContext
+    }()
+    
     //MARK: NSFetchedResultsController
     lazy var fetchedResultsController : NSFetchedResultsController<NSFetchRequestResult> =
         {
-        //create the fetch request
-        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Photo")
-        
-        //add a sort descriptor, enforces a sort order on the results
-        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "dateCreated", ascending: false)]
-        
-        //add a predicate to only get photos for the specified pin
-        if let latitude = self.pin?.latitude, let longitude = self.pin?.longitude
-        {
-            let predicate = NSPredicate(format: "(pin.latitude == %@) AND (pin.longitude == %@)", latitude, longitude)
-            fetchRequest.predicate = predicate
-        }
-        
-        //create fetched results controller
-        let fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: self.sharedContext, sectionNameKeyPath: nil, cacheName: nil)
-        
-        return fetchedResultsController
-        
-        }()
+            //create the fetch request
+            let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Photo")
+            
+            //add a sort descriptor, enforces a sort order on the results
+            fetchRequest.sortDescriptors = [NSSortDescriptor(key: "dateCreated", ascending: false)]
+            
+            //add a predicate to only get photos for the specified pin
+            if let latitude = self.pin?.latitude, let longitude = self.pin?.longitude {
+                let latitude = latitude as Float
+                let longitude = longitude as Float
+                let predicate = NSPredicate(format: "(pin.latitude == %@) AND (pin.longitude == %@)", latitude, longitude)
+                fetchRequest.predicate = predicate
+            }
+            
+            //create fetched results controller
+            let fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: self.sharedContext, sectionNameKeyPath: nil, cacheName: nil)
+            
+            return fetchedResultsController
+            
+    }()
     
     func loadFetchedResultsController()
     {
@@ -143,10 +144,10 @@ class PhotoViewController: UIViewController
     func removePhotosFromPin(_ indexPath:IndexPath)
     {
         handleManagedObjectContextOperations
-        { () -> Void in
-            let photo = self.fetchedResultsController.object(at: indexPath) as! Photo
-            self.sharedContext.delete(photo)
-            CoreDataStack.sharedInstance.saveMainContext()
+            { () -> Void in
+                let photo = self.fetchedResultsController.object(at: indexPath) as! Photo
+                self.sharedContext.delete(photo)
+                CoreDataStack.sharedInstance.saveMainContext()
         }
     }
     
@@ -249,7 +250,7 @@ class PhotoViewController: UIViewController
             }
         }
     }
-
+    
 }
 
 extension PhotoViewController : UICollectionViewDelegate
