@@ -36,7 +36,7 @@ public class PinAnnotation: NSManagedObject
         
         super.init(entity: pinEntity, insertInto: context)
         
-        latitude = dictionary[Keys.latitude] as! Double
-        longitude = dictionary[Keys.longitude] as! Double
+        latitude = Float(dictionary[Keys.latitude] as! Double)
+        longitude = Float(dictionary[Keys.longitude] as! Double)
     }
 }

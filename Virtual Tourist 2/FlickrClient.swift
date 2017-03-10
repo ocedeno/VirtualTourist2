@@ -156,7 +156,7 @@ class FlickrClient
         var parameters = [String:AnyObject]()
         
         //setup parameters for query
-        parameters["bbox"] = createBBox(pin.latitude, longitude: pin.longitude) as AnyObject?
+        parameters["bbox"] = createBBox(Double(pin.latitude), longitude: Double(pin.longitude)) as AnyObject?
         parameters["safe_search"] = FlickrConstants.SafeSearch as AnyObject?
         parameters["extras"] = FlickrConstants.extras as AnyObject?
         parameters["api_key"] = FlickrConstants.APIKey as AnyObject?

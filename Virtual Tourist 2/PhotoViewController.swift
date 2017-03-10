@@ -72,9 +72,9 @@ class PhotoViewController: UIViewController
     {
         if let pin = pin
         {
-            let latitude = pin.latitude
-            let longitude = pin.longitude
-            let center = CLLocationCoordinate2D(latitude: CLLocationDegrees(latitude), longitude: CLLocationDegrees(longitude))
+            let latitude = pin.latitude as! CLLocationDegrees
+            let longitude = pin.longitude as! CLLocationDegrees
+            let center = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
             let region = MKCoordinateRegion(center: center, span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05))
             mapView.setRegion(region, animated: true)
         }
@@ -107,8 +107,8 @@ class PhotoViewController: UIViewController
             
             //add a predicate to only get photos for the specified pin
             if let latitude = self.pin?.latitude, let longitude = self.pin?.longitude {
-                let latitude = latitude as Float
-                let longitude = longitude as Float
+                let latitude = latitude as NSNumber
+                let longitude = longitude as NSNumber
                 let predicate = NSPredicate(format: "(pin.latitude == %@) AND (pin.longitude == %@)", latitude, longitude)
                 fetchRequest.predicate = predicate
             }
