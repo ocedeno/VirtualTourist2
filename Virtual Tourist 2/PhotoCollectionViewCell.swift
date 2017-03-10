@@ -22,7 +22,10 @@ class PhotoCollectionViewCell: UICollectionViewCell
             photoCellLoadingView.addSubview(activityIndicatorView)
             activityIndicatorView.hidesWhenStopped = true
             activityIndicatorView.activityIndicatorViewStyle = .whiteLarge
-            activityIndicatorView.startAnimating()
+            performUIUpdatesOnMain
+                {
+                activityIndicatorView.startAnimating()
+                }
         }
     }
 }
