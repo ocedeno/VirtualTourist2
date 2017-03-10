@@ -14,7 +14,7 @@ public class Photo: NSManagedObject
 {
     struct Keys
     {
-        static let imageURL = "imageURL"
+        static let imageData = "imageData"
         static let dateCreated = "dateCreated"
         static let imageCoordinates = "imageCoordinates"
     }
@@ -50,7 +50,7 @@ public class Photo: NSManagedObject
         
         imageCoordinates = dictionary[Keys.imageCoordinates] as? String
         dateCreated = dictionary[Keys.dateCreated] as! Date as NSDate?
-        imageURL = dictionary[Keys.imageURL] as? String
+        imageData = dictionary[Keys.imageData] as? String
     }
     
     override public func prepareForDeletion() {
