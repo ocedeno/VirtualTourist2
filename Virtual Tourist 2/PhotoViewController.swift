@@ -87,6 +87,7 @@ class PhotoViewController: UIViewController
         let width = view.frame.width / 4
         let layout = photoCollectionView.collectionViewLayout as! UICollectionViewFlowLayout
         layout.itemSize = CGSize(width: width + 1, height: width + 1)
+
     }
     
     //MARK: - Shared Context
@@ -152,9 +153,12 @@ class PhotoViewController: UIViewController
     
     @IBAction func newCollectionSelected(_ sender: UIBarButtonItem)
     {
-        if (selectedPhotos?.count)! > 0 {
-            photoCollectionView.performBatchUpdates({ () -> Void in
-                for indexPath in (self.selectedPhotos?.sorted(by: { $0.item > $1.item}))! {
+        if (selectedPhotos?.count)! > 0
+        {
+            photoCollectionView.performBatchUpdates(
+            { () -> Void in
+                for indexPath in (self.selectedPhotos?.sorted(by: { $0.item > $1.item}))!
+                {
                     self.removePhotosFromPin(indexPath)
                 }
                 
@@ -165,23 +169,28 @@ class PhotoViewController: UIViewController
                     self.newCollectionButton.title = "New Collection"
                 })
             })
-        } else {
+        } else
+        {
             newCollectionButton.isEnabled = false
             
-            photoCollectionView.performBatchUpdates({ () -> Void in
-                if let pin = self.pin, let _ = pin.photos {
+            photoCollectionView.performBatchUpdates(
+            { () -> Void in
+                if let pin = self.pin, let _ = pin.photos
+                {
                     self.isFetching = true
-                    for photo in self.fetchedResultsController.fetchedObjects as! [Photo] {
+                    for photo in self.fetchedResultsController.fetchedObjects as! [Photo]
+                    {
                         self.sharedContext.delete(photo)
                     }
                     
                     CoreDataStack.sharedInstance.saveMainContext()
                     
                 }
-            }, completion: { (completed) -> Void in
+            }, completion:
+                { (completed) -> Void in
                 self.isFetching = false
                 self.getPhotos()
-            })
+                })
         }
     }
     
