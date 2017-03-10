@@ -231,7 +231,7 @@ class PhotoViewController: UIViewController
                                     if let photoFileName = urlString.components(separatedBy: "/").last
                                     {
                                         let photo = Photo(context: self.sharedContext)
-                                        photo.imageURL = urlString
+                                        photo.image = urlString
                                         photo.dateCreated = self.photoURLs![urlString]! as NSDate?
                                         photo.pin = self.pin!
                                         photo.imageCoordinates = photoFileName
@@ -349,7 +349,7 @@ extension PhotoViewController : UICollectionViewDataSource
         } else
         {
             //if the file does not exist download it from the Internet and save it
-            if let imageURL = URL(string: photo.imageURL!)
+            if let imageURL = URL(string: photo.imageData!)
             {
                 performDownloadsAndUpdateInBackground({ () -> Void in
                     if let imageData = try? Data(contentsOf: imageURL)

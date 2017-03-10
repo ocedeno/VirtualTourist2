@@ -3,7 +3,7 @@
     <entity name="Photo" representedClassName=".Photo" syncable="YES">
         <attribute name="dateCreated" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="imageCoordinates" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="imageURL" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="imageData" optional="YES" attributeType="Binary" syncable="YES"/>
         <relationship name="pin" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="PinAnnotation" inverseName="photos" inverseEntity="PinAnnotation" syncable="YES"/>
     </entity>
     <entity name="PinAnnotation" representedClassName=".PinAnnotation" syncable="YES">

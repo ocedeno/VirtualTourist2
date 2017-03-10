@@ -19,7 +19,7 @@ extension Photo
 
     @NSManaged public var dateCreated: NSDate?
     @NSManaged public var imageCoordinates: String?
-    @NSManaged public var imageURL: String?
+    @NSManaged public var imageData: NSData?
     @NSManaged public var pin: PinAnnotation?
 
 }
