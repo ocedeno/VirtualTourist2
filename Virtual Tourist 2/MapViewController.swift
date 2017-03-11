@@ -12,7 +12,6 @@ import CoreData
 
 class MapViewController: UIViewController
 {
-
     @IBOutlet weak var mapView: MKMapView!
     @IBOutlet weak var editButton: UIBarButtonItem!
     
@@ -20,13 +19,15 @@ class MapViewController: UIViewController
     var deleteButton: UIButton!
     var isMapEditing = false
     var buttonHeight: CGFloat = 0.0
+    //percentage of height for delete button in any orientation
+    var buttonHeightConstant:CGFloat = 0.096
     var currentPin: MyPinAnnotation?
-    var utility = Utility()
+    let utility = Utility()
     
     //MARK: - Shared Context
     lazy var sharedContext: NSManagedObjectContext =
         {
-        CoreDataStack.sharedInstance.managedObjectContext
+            CoreDataStack.sharedInstance.managedObjectContext
         }()
     
     var mapSettingPath: String
@@ -36,9 +37,6 @@ class MapViewController: UIViewController
         
             return url.appendingPathComponent("mapset").path
         }
-    
-    //percentage of height for delete button in any orientation
-    var buttonHeightConstant:CGFloat = 0.096
 
     override func viewDidLoad()
     {
@@ -186,7 +184,7 @@ class MapViewController: UIViewController
         
         do
         {
-            if let results = try CoreDataStack.sharedInstance.managedObjectContext.fetch(fetchRequest) as? [PinAnnotation]
+            if let results = try sharedContext.fetch(fetchRequest) as? [PinAnnotation]
             {
                 for mapPin in results
                 {
@@ -216,7 +214,6 @@ class MapViewController: UIViewController
             }
         }
     }
-
 }
 
 extension MapViewController : MKMapViewDelegate
@@ -252,7 +249,6 @@ extension MapViewController : MKMapViewDelegate
                     
                     //save the context
                     CoreDataStack.sharedInstance.saveMainContext()
-                    
                     
                     mapView.removeAnnotation(annotation)
                 }
