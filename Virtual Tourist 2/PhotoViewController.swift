@@ -18,10 +18,10 @@ class PhotoViewController: UIViewController
     
     fileprivate var selectedPhotos:[IndexPath]?
     fileprivate var isFetching = false
-    fileprivate var photosFilePath: String
-    {
-        return NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first!
-    }
+    //    fileprivate var photosFilePath: String
+    //    {
+    //        return NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first!
+    //    }
     
     @IBOutlet weak var mapView: MKMapView!
     @IBOutlet weak var photoCollectionView: UICollectionView!
@@ -88,7 +88,7 @@ class PhotoViewController: UIViewController
         let width = view.frame.width / 4
         let layout = photoCollectionView.collectionViewLayout as! UICollectionViewFlowLayout
         layout.itemSize = CGSize(width: width + 1, height: width + 1)
-
+        
     }
     
     //MARK: - Shared Context
@@ -150,12 +150,12 @@ class PhotoViewController: UIViewController
         if (selectedPhotos?.count)! > 0
         {
             photoCollectionView.performBatchUpdates(
-            { () -> Void in
-                for indexPath in (self.selectedPhotos?.sorted(by: { $0.item > $1.item}))!
-                {
-                    self.removePhotosFromPin(indexPath)
-                }
-                
+                { () -> Void in
+                    for indexPath in (self.selectedPhotos?.sorted(by: { $0.item > $1.item}))!
+                    {
+                        self.removePhotosFromPin(indexPath)
+                    }
+                    
             }, completion: { (completed) -> Void in
                 performUIUpdatesOnMain({ () -> Void in
                     self.photoCollectionView.deleteItems(at: self.selectedPhotos!)
@@ -168,23 +168,23 @@ class PhotoViewController: UIViewController
             newCollectionButton.isEnabled = false
             
             photoCollectionView.performBatchUpdates(
-            { () -> Void in
-                if let pin = self.pin, let _ = pin.photos
-                {
-                    self.isFetching = true
-                    for photo in self.fetchedResultsController.fetchedObjects as! [Photo]
+                { () -> Void in
+                    if let pin = self.pin, let _ = pin.photos
                     {
-                        self.sharedContext.delete(photo)
+                        self.isFetching = true
+                        for photo in self.fetchedResultsController.fetchedObjects as! [Photo]
+                        {
+                            self.sharedContext.delete(photo)
+                        }
+                        
+                        CoreDataStack.sharedInstance.saveMainContext()
+                        
                     }
-                    
-                    CoreDataStack.sharedInstance.saveMainContext()
-                    
-                }
             }, completion:
                 { (completed) -> Void in
-                self.isFetching = false
-                self.getPhotos()
-                })
+                    self.isFetching = false
+                    self.getPhotos()
+            })
         }
     }
     
@@ -205,6 +205,7 @@ class PhotoViewController: UIViewController
                 {
                     if let photosDesc = photosDict["photo"] as? [[String:AnyObject]]
                     {
+                        print("\(photosDesc)")
                         self.photoURLs = [String:Date]()
                         let dateFormatter = DateFormatter()
                         dateFormatter.dateFormat = "yyyy-MM-dd hh:mm:ss"
@@ -222,15 +223,12 @@ class PhotoViewController: UIViewController
                             handleManagedObjectContextOperations({ () -> Void in
                                 for urlString in self.photoURLs!.keys
                                 {
-                                    if let photoFileName = urlString.components(separatedBy: "/").last
-                                    {
-                                        let photo = Photo(context: self.sharedContext)
-                                        photo.imageData = urlString
-                                        photo.dateCreated = self.photoURLs![urlString]! as NSDate?
-                                        photo.pin = self.pin!
-                                        photo.imageCoordinates = photoFileName
-                                        CoreDataStack.sharedInstance.saveMainContext()
-                                    }
+                                    let photo = Photo(context: self.sharedContext)
+                                    let url = URL(string: urlString)
+                                    photo.imageData = NSData(contentsOf: url!)
+                                    photo.dateCreated = self.photoURLs![urlString]! as NSDate?
+                                    photo.pin = self.pin!
+                                    CoreDataStack.sharedInstance.saveMainContext()
                                 }
                                 
                                 //performUIUpdatesOnMain({ () -> Void in
@@ -333,31 +331,23 @@ extension PhotoViewController : UICollectionViewDataSource
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "photoCell", for: indexPath) as! PhotoCollectionViewCell
         
         let photo = fetchedResultsController.object(at: indexPath) as! Photo
-        
-        let imageLocation = photo.imageCoordinates!
-        
-        if FileManager.default.fileExists(atPath: URL(string: self.photosFilePath)!.appendingPathComponent(imageLocation).path)
+                
+        if let _ = photo.imageData
         {
-            cell.photoCellImageView.image = UIImage(contentsOfFile: URL(string: self.photosFilePath)!.appendingPathComponent(imageLocation).path)
+            cell.photoCellImageView.image = UIImage(data: photo.imageData as! Data)
             cell.photoCellLoadingView.isHidden = true
-        } else
+        }
+        else
         {
             //if the file does not exist download it from the Internet and save it
-            if let imageURL = URL(string: photo.imageData!)
-            {
-                performDownloadsAndUpdateInBackground({ () -> Void in
-                    if let imageData = try? Data(contentsOf: imageURL)
-                    {
-                        //save file
-                        try? imageData.write(to: URL(fileURLWithPath: URL(string: self.photosFilePath)!.appendingPathComponent(imageURL.lastPathComponent).path), options: [.atomic])
-                        
-                        performUIUpdatesOnMain({ () -> Void in
-                            cell.photoCellImageView.image = UIImage(data: imageData)
-                            cell.photoCellLoadingView.isHidden = true
-                        })
-                    }
+            performDownloadsAndUpdateInBackground({ () -> Void in
+                
+                performUIUpdatesOnMain({ () -> Void in
+                    self.getPhotos()
+                    cell.photoCellImageView.image = UIImage(data: photo.imageData as! Data)
+                    cell.photoCellLoadingView.isHidden = true
                 })
-            }
+            })
         }
         
         return configure(cell, forRowAtIndexPath: indexPath)
