@@ -38,22 +38,7 @@ class MapViewController: UIViewController
     
     //percentage of height for delete button in any orientation
     var buttonHeightConstant:CGFloat = 0.096
-    
-    @IBAction func editButtonSelected(_ sender: UIBarButtonItem)
-    {
-        isMapEditing = !isMapEditing
-        
-        if isMapEditing
-        {
-            editButton.title = "Done"
-            alterMapHeight(true)
-        }else
-        {
-            editButton.title = "Edit"
-            alterMapHeight(false)
-        }
-    }
-    
+
     override func viewDidLoad()
     {
         super.viewDidLoad()
@@ -70,7 +55,7 @@ class MapViewController: UIViewController
     }
     
     override func viewWillAppear(_ animated: Bool)
-    {
+     {
         super.viewWillAppear(animated)
         
         //reposition map region and span
@@ -87,6 +72,21 @@ class MapViewController: UIViewController
             let mapSpan = MKCoordinateSpan(latitudeDelta: latDelta, longitudeDelta: longDelta)
             
             mapView.region.span = mapSpan
+        }
+    }
+    
+    @IBAction func editButtonSelected(_ sender: UIBarButtonItem)
+    {
+        isMapEditing = !isMapEditing
+        
+        if isMapEditing
+        {
+            editButton.title = "Done"
+            alterMapHeight(true)
+        }else
+        {
+            editButton.title = "Edit"
+            alterMapHeight(false)
         }
     }
     
@@ -110,14 +110,6 @@ class MapViewController: UIViewController
                 self.deleteButton.isHidden = !buttonVisible
             })
         }
-    }
-    
-    func createAlert(withTitle title:String, message:String)
-    {
-        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        let action = UIAlertAction(title: "OK", style: .default, handler: nil)
-        alert.addAction(action)
-        present(alert, animated: true, completion: nil)
     }
     
     override func willAnimateRotation(to toInterfaceOrientation: UIInterfaceOrientation, duration: TimeInterval)

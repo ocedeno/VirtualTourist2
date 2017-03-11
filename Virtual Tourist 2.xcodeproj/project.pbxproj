@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		065F82C91E7439E900BE7220 /* Utility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 065F82C81E7439E900BE7220 /* Utility.swift */; };
 		06605CF61E719744006A0004 /* Photo+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06605CF21E719744006A0004 /* Photo+CoreDataClass.swift */; };
 		06605CF71E719744006A0004 /* Photo+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06605CF31E719744006A0004 /* Photo+CoreDataProperties.swift */; };
 		06605CF81E719744006A0004 /* PinAnnotation+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06605CF41E719744006A0004 /* PinAnnotation+CoreDataClass.swift */; };
@@ -45,6 +46,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		065F82C81E7439E900BE7220 /* Utility.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Utility.swift; sourceTree = "<group>"; };
 		06605CF21E719744006A0004 /* Photo+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "Photo+CoreDataClass.swift"; path = "../Photo+CoreDataClass.swift"; sourceTree = "<group>"; };
 		06605CF31E719744006A0004 /* Photo+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "Photo+CoreDataProperties.swift"; path = "../Photo+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		06605CF41E719744006A0004 /* PinAnnotation+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "PinAnnotation+CoreDataClass.swift"; path = "../PinAnnotation+CoreDataClass.swift"; sourceTree = "<group>"; };
@@ -202,6 +204,7 @@
 				06605CFC1E719BC8006A0004 /* GCDBlackBox.swift */,
 				06605CFE1E71B11D006A0004 /* CoreDataStack.swift */,
 				06605D001E71B4F2006A0004 /* FlickrClient.swift */,
+				065F82C81E7439E900BE7220 /* Utility.swift */,
 			);
 			name = API;
 			sourceTree = "<group>";
@@ -343,6 +346,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				065F82C91E7439E900BE7220 /* Utility.swift in Sources */,
 				06605CF71E719744006A0004 /* Photo+CoreDataProperties.swift in Sources */,
 				06605CFB1E719866006A0004 /* PhotoCollectionViewCell.swift in Sources */,
 				06605CF61E719744006A0004 /* Photo+CoreDataClass.swift in Sources */,
