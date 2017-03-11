@@ -37,15 +37,16 @@ class FlickrClient
         static let MaxItemsPerPage = 20
     }
     
+    func sendError(_ error: String) -> NSError
+    {
+        print(error)
+        let userInfo = [NSLocalizedDescriptionKey: error]
+        return NSError(domain: "taskForGetMethod", code: -1, userInfo: userInfo)
+    }
+
+    
     fileprivate func errorCheck(_ data: Data?, response: URLResponse?, error: NSError?) -> NSError?
     {
-        func sendError(_ error: String) -> NSError
-        {
-            print(error)
-            let userInfo = [NSLocalizedDescriptionKey: error]
-            return NSError(domain: "taskForGetMethod", code: -1, userInfo: userInfo)
-        }
-        
         //was there an error
         guard (error == nil) else
         {
@@ -120,7 +121,7 @@ class FlickrClient
         }
         
         let task = session.dataTask(with: request as URLRequest)
-        { (data, response, error) in
+        {(data, response, error) in
             if let error = self.errorCheck(data as Data?, response: response, error: error as NSError?)
             {
                 handler(nil, error)

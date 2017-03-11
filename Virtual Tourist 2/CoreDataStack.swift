@@ -9,24 +9,31 @@
 import Foundation
 import CoreData
 
-class CoreDataStack : NSObject {
+class CoreDataStack : NSObject
+{
     static let sharedInstance = CoreDataStack()
     static let moduleName = "VirtualTouristModel"
     
-    struct Constants {
-        struct EntityNames {
+    struct Constants
+    {
+        struct EntityNames
+        {
             static let PhotoEntityName = "Photo"
             static let PinEntityName = "PinAnnotation"
         }
     }
     
     //save managed context if changes exist
-    func saveMainContext() {
-        handleManagedObjectContextOperations { () -> Void in
-            if self.managedObjectContext.hasChanges {
-                do {
+    func saveMainContext()
+    {
+        handleManagedObjectContextOperations{ () -> Void in
+            if self.managedObjectContext.hasChanges
+            {
+                do
+                {
                     try self.managedObjectContext.save()
-                } catch {
+                } catch
+                {
                     let saveError = error as NSError
                     print("There was an error saving main managed object context! \(saveError)")
                 }
@@ -34,7 +41,8 @@ class CoreDataStack : NSObject {
         }
     }
     
-    lazy var persistentStoreCoordinator:NSPersistentStoreCoordinator = {
+    lazy var persistentStoreCoordinator: NSPersistentStoreCoordinator = 
+    {
         //location of the managed object model persisted on disk
         let modelURL = Bundle.main.url(forResource: moduleName, withExtension: "momd")!
         
@@ -50,9 +58,9 @@ class CoreDataStack : NSObject {
         //add the persistent store to the persistent store coordinator
         do {
             try coordinator.addPersistentStore(ofType: NSSQLiteStoreType,
-                                               configurationName: nil,
-                                               at: persistentStoreURL,
-                                               options: [NSMigratePersistentStoresAutomaticallyOption: true,
+                                    configurationName: nil,
+                                                   at: persistentStoreURL,
+                                              options: [NSMigratePersistentStoresAutomaticallyOption: true,
                                                          NSInferMappingModelAutomaticallyOption : true])
         } catch {
             fatalError("Persistent store error! \(error)")
@@ -63,10 +71,12 @@ class CoreDataStack : NSObject {
     }()
     
     //create managed object context
-    lazy var managedObjectContext:NSManagedObjectContext = {
+    lazy var managedObjectContext:NSManagedObjectContext =
+    {
         let managedObjectContext = NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType)
         managedObjectContext.persistentStoreCoordinator = self.persistentStoreCoordinator
         return managedObjectContext
     }()
+    
 }
 

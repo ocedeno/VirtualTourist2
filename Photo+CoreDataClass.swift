@@ -20,9 +20,9 @@ public class Photo: NSManagedObject
     }
     
     fileprivate var photosFilePath: String
-        {
-            return NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first!
-        }
+    {
+        return NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first!
+    }
     
     override init(entity: NSEntityDescription, insertInto context: NSManagedObjectContext?)
     {
@@ -50,13 +50,15 @@ public class Photo: NSManagedObject
         
         imageCoordinates = dictionary[Keys.imageCoordinates] as? String
         dateCreated = dictionary[Keys.dateCreated] as! Date as NSDate?
-        imageData = dictionary[Keys.imageData] as? String
+        imageData = dictionary[Keys.imageData] as? NSData
     }
     
-    override public func prepareForDeletion() {
+    override public func prepareForDeletion()
+    {
         //delete photos from disk
         
-        if let imageCoordinates = self.imageCoordinates {
+         if let imageCoordinates = self.imageCoordinates
+         {
             if FileManager.default.fileExists(atPath: URL(string: self.photosFilePath)!.appendingPathComponent(imageCoordinates).path) {
                 do {
                     try FileManager.default.removeItem(atPath: URL(string: self.photosFilePath)!.appendingPathComponent(imageCoordinates).path)

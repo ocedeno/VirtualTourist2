@@ -231,7 +231,7 @@ class PhotoViewController: UIViewController
                                     if let photoFileName = urlString.components(separatedBy: "/").last
                                     {
                                         let photo = Photo(context: self.sharedContext)
-                                        photo.image = urlString
+                                        photo.imageData = urlString
                                         photo.dateCreated = self.photoURLs![urlString]! as NSDate?
                                         photo.pin = self.pin!
                                         photo.imageCoordinates = photoFileName
