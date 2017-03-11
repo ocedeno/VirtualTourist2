@@ -21,6 +21,7 @@ class MapViewController: UIViewController
     var isMapEditing = false
     var buttonHeight: CGFloat = 0.0
     var currentPin: MyPinAnnotation?
+    var utility = Utility()
     
     //MARK: - Shared Context
     lazy var sharedContext: NSManagedObjectContext =
@@ -200,7 +201,7 @@ class MapViewController: UIViewController
             }
         }catch
         {
-            createAlert(withTitle: "Query Error", message: "There was an error retrieving the pins from the database!")
+            utility.createAlert(withTitle: "Query Error", message: "There was an error retrieving the pins from the database!", sender: self as UIViewController)
         }
     }
     

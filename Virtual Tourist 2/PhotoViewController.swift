@@ -14,6 +14,7 @@ class PhotoViewController: UIViewController
 {
     var pin: PinAnnotation?
     var photoURLs: [String:Date]?
+    let utility = Utility()
     
     fileprivate var selectedPhotos:[IndexPath]?
     fileprivate var isFetching = false
@@ -130,15 +131,8 @@ class PhotoViewController: UIViewController
         } catch {
             let fetchError = error as NSError
             print("\(fetchError), \(fetchError.userInfo)")
-            self.createAlert(withTitle: "Failed Query", message: "Failed to load photos")
+            self.utility.createAlert(withTitle: "Failed Query", message: "Failed to load photos", sender: self as UIViewController)
         }
-    }
-    
-    func createAlert(withTitle title:String, message:String) {
-        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        let action = UIAlertAction(title: "OK", style: .default, handler: nil)
-        alert.addAction(action)
-        present(alert, animated: true, completion: nil)
     }
     
     func removePhotosFromPin(_ indexPath:IndexPath)
@@ -202,7 +196,7 @@ class PhotoViewController: UIViewController
             
             guard error == nil else
             {
-                self.createAlert(withTitle: "Failed Query", message: "Could not retrieve images for this pin location")
+                self.utility.createAlert(withTitle: "Failed Query", message: "Could not retrieve images for this pin location", sender: self as UIViewController)
                 return
             }
             
