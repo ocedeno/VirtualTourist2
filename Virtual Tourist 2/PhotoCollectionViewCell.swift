@@ -12,8 +12,9 @@ class PhotoCollectionViewCell: UICollectionViewCell
 {
     @IBOutlet weak var photoCellImageView: UIImageView!
     @IBOutlet weak var photoCellLoadingView: UIView!
+    {
+        didSet
         {
-        didSet {
             photoCellLoadingView.clipsToBounds = true
             photoCellLoadingView.layer.cornerRadius = 10
             let activityIndicatorView = UIActivityIndicatorView(frame: CGRect(x: 0, y: 0, width:

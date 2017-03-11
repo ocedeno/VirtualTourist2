@@ -56,7 +56,6 @@ public class Photo: NSManagedObject
     override public func prepareForDeletion()
     {
         //delete photos from disk
-        
          if let imageCoordinates = self.imageCoordinates
          {
             if FileManager.default.fileExists(atPath: URL(string: self.photosFilePath)!.appendingPathComponent(imageCoordinates).path) {
