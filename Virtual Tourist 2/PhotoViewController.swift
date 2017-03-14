@@ -240,10 +240,10 @@ class PhotoViewController: UIViewController
                                 }
                                 
                                 performUIUpdatesOnMain({ () -> Void in
-                                self.photoCollectionView.isHidden = false
-                                self.newCollectionButton.isEnabled = true
-                                
-                            })
+                                    self.photoCollectionView.isHidden = false
+                                    self.newCollectionButton.isEnabled = true
+                                    
+                                })
                             })
                         } else {
                             performUIUpdatesOnMain({ () -> Void in
@@ -320,7 +320,7 @@ extension PhotoViewController : UICollectionViewDataSource
                 })
             }
         }
-
+        
         return cell
     }
     
@@ -344,7 +344,7 @@ extension PhotoViewController : UICollectionViewDataSource
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "photoCell", for: indexPath) as! PhotoCollectionViewCell
         
         let photo = fetchedResultsController.object(at: indexPath) as! Photo
-                
+        
         if let _ = photo.imageData
         {
             cell.photoCellImageView.image = UIImage(data: photo.imageData as! Data)
@@ -353,13 +353,10 @@ extension PhotoViewController : UICollectionViewDataSource
         else
         {
             //if the file does not exist download it from the Internet and save it
-            performDownloadsAndUpdateInBackground({ () -> Void in
-                
-                performUIUpdatesOnMain({ () -> Void in
-                    self.getPhotos()
-                    cell.photoCellImageView.image = UIImage(data: photo.imageData as! Data)
-                    cell.photoCellLoadingView.isHidden = true
-                })
+            performUIUpdatesOnMain({ () -> Void in
+                self.getPhotos()
+                cell.photoCellImageView.image = UIImage(data: photo.imageData as! Data)
+                cell.photoCellLoadingView.isHidden = true
             })
         }
         
