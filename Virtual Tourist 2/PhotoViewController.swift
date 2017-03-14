@@ -205,7 +205,6 @@ class PhotoViewController: UIViewController
                 {
                     if let photosDesc = photosDict["photo"] as? [[String:AnyObject]]
                     {
-                        print("\(photosDesc)")
                         self.photoURLs = [String:Date]()
                         let dateFormatter = DateFormatter()
                         dateFormatter.dateFormat = "yyyy-MM-dd hh:mm:ss"
@@ -312,7 +311,7 @@ extension PhotoViewController : UICollectionViewDataSource
                 })
             }
         }
-        
+
         return cell
     }
     
