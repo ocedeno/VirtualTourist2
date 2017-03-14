@@ -33,3 +33,9 @@ func handleManagedObjectContextOperations(_ updates:@escaping () -> Void ) {
         updates()
     }
 }
+
+func background(_ updates:@escaping () -> Void ){
+    CoreDataStack.sharedInstance.backgroundContext.perform {
+        updates()
+    }
+}

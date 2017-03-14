@@ -141,7 +141,10 @@ class PhotoViewController: UIViewController
             { () -> Void in
                 let photo = self.fetchedResultsController.object(at: indexPath) as! Photo
                 self.sharedContext.delete(photo)
-                CoreDataStack.sharedInstance.save()
+                CoreDataStack.sharedInstance.persistingContext.perform
+                    {
+                        CoreDataStack.sharedInstance.save()
+                }
         }
     }
     
@@ -177,7 +180,10 @@ class PhotoViewController: UIViewController
                             self.sharedContext.delete(photo)
                         }
                         
-                        CoreDataStack.sharedInstance.save()
+                        CoreDataStack.sharedInstance.persistingContext.perform
+                            {
+                                CoreDataStack.sharedInstance.save()
+                        }
                         
                     }
             }, completion:
@@ -227,15 +233,18 @@ class PhotoViewController: UIViewController
                                     photo.imageData = NSData(contentsOf: url!)
                                     photo.dateCreated = self.photoURLs![urlString]! as NSDate?
                                     photo.pin = self.pin!
-                                    CoreDataStack.sharedInstance.save()
+                                    CoreDataStack.sharedInstance.persistingContext.perform
+                                        {
+                                            CoreDataStack.sharedInstance.save()
+                                    }
                                 }
                                 
-                                //performUIUpdatesOnMain({ () -> Void in
+                                performUIUpdatesOnMain({ () -> Void in
                                 self.photoCollectionView.isHidden = false
                                 self.newCollectionButton.isEnabled = true
                                 
                             })
-                            
+                            })
                         } else {
                             performUIUpdatesOnMain({ () -> Void in
                                 self.photoCollectionView.isHidden = true

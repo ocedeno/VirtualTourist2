@@ -171,7 +171,10 @@ class MapViewController: UIViewController
                     })
                     
                     //save the pin
+                    CoreDataStack.sharedInstance.persistingContext.perform
+                        {
                     CoreDataStack.sharedInstance.save()
+                    }
                     
                     //after the pin has been saved -- there is no longer a current pin
                     currentPin = nil
@@ -253,7 +256,10 @@ extension MapViewController : MKMapViewDelegate
                     sharedContext.delete(pin)
                     
                     //save the context
-                    CoreDataStack.sharedInstance.save()
+                    CoreDataStack.sharedInstance.persistingContext.perform
+                        {
+                            CoreDataStack.sharedInstance.save()
+                    }
                     
                     mapView.removeAnnotation(annotation)
                 }
