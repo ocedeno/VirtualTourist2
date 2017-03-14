@@ -162,13 +162,16 @@ class MapViewController: UIViewController
             case .ended:
                 if let pin = self.currentPin
                 {
+                    background {
+                    
                     let pinEntity = PinAnnotation(context: self.sharedContext)
                     pinEntity.latitude = (Float(pin.coordinate.latitude) as NSNumber?)!
                     pinEntity.longitude = (Float(pin.coordinate.longitude) as NSNumber?)!
                     pin.pin = pinEntity
-                    flickrClient.getPhotosByLocation(using: pin.pin!, completionHandler: { (result, error) in
+                    self.flickrClient.getPhotosByLocation(using: pin.pin!, completionHandler: { (result, error) in
                         return
                     })
+                    }
                     
                     //save the pin
                     CoreDataStack.sharedInstance.persistingContext.perform

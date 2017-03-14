@@ -137,7 +137,7 @@ class PhotoViewController: UIViewController
     
     func removePhotosFromPin(_ indexPath:IndexPath)
     {
-        handleManagedObjectContextOperations
+        background
             { () -> Void in
                 let photo = self.fetchedResultsController.object(at: indexPath) as! Photo
                 self.sharedContext.delete(photo)
@@ -225,7 +225,7 @@ class PhotoViewController: UIViewController
                         
                         if self.photoURLs!.keys.count > 0
                         {
-                            handleManagedObjectContextOperations({ () -> Void in
+                            background({ () -> Void in
                                 for urlString in self.photoURLs!.keys
                                 {
                                     let photo = Photo(context: self.sharedContext)
