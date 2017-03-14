@@ -33,7 +33,7 @@ class PhotoViewController: UIViewController
         super.viewDidLoad()
         
         mapView.isUserInteractionEnabled = false
-        //photoCollectionView.backgroundColor = UIColor.white
+        photoCollectionView.backgroundColor = UIColor.white
         photoCollectionView.delegate = self
         photoCollectionView.dataSource = self
         photoCollectionView.allowsMultipleSelection = true
@@ -94,7 +94,7 @@ class PhotoViewController: UIViewController
     //MARK: - Shared Context
     lazy var sharedContext: NSManagedObjectContext =
         {
-            CoreDataStack.sharedInstance.managedObjectContext
+            CoreDataStack.sharedInstance.mainContext
     }()
     
     //MARK: NSFetchedResultsController
@@ -141,7 +141,7 @@ class PhotoViewController: UIViewController
             { () -> Void in
                 let photo = self.fetchedResultsController.object(at: indexPath) as! Photo
                 self.sharedContext.delete(photo)
-                CoreDataStack.sharedInstance.saveMainContext()
+                CoreDataStack.sharedInstance.save()
         }
     }
     
@@ -177,7 +177,7 @@ class PhotoViewController: UIViewController
                             self.sharedContext.delete(photo)
                         }
                         
-                        CoreDataStack.sharedInstance.saveMainContext()
+                        CoreDataStack.sharedInstance.save()
                         
                     }
             }, completion:
@@ -227,7 +227,7 @@ class PhotoViewController: UIViewController
                                     photo.imageData = NSData(contentsOf: url!)
                                     photo.dateCreated = self.photoURLs![urlString]! as NSDate?
                                     photo.pin = self.pin!
-                                    CoreDataStack.sharedInstance.saveMainContext()
+                                    CoreDataStack.sharedInstance.save()
                                 }
                                 
                                 //performUIUpdatesOnMain({ () -> Void in

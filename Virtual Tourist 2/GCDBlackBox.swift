@@ -17,13 +17,13 @@ func performUIUpdatesOnMain(_ updates:@escaping () -> Void ) {
 }
 
 func performDownloadsAndUpdateInBackground(_ updates:@escaping () -> Void) {
-    DispatchQueue.global(qos: DispatchQoS.QoSClass.userInteractive).async { () -> Void in
+    DispatchQueue.global(qos: DispatchQoS.QoSClass.background).async { () -> Void in
         updates()
     }
 }
 
 func handleBackgroundFileOperations(_ updates:@escaping () -> Void) {
-    DispatchQueue.global(qos: DispatchQoS.QoSClass.userInitiated).async { () -> Void in
+    DispatchQueue.global(qos: DispatchQoS.QoSClass.utility).async { () -> Void in
         updates()
     }
 }

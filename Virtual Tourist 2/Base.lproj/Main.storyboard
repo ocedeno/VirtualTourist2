@@ -91,7 +91,6 @@
                                                     <subviews>
                                                         <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="wYb-68-wQW" userLabel="Photo Cell Image View">
                                                             <rect key="frame" x="0.0" y="0.0" width="114" height="106"/>
-                                                            <color key="backgroundColor" red="0.1416396717" green="0.86628643859999999" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                         </imageView>
                                                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Isa-fQ-JTy" userLabel="Loading View">
                                                             <rect key="frame" x="8" y="8" width="98" height="90"/>

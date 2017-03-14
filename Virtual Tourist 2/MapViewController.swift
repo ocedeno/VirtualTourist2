@@ -29,7 +29,7 @@ class MapViewController: UIViewController
     //MARK: - Shared Context
     lazy var sharedContext: NSManagedObjectContext =
         {
-            CoreDataStack.sharedInstance.managedObjectContext
+            CoreDataStack.sharedInstance.mainContext
         }()
     
     var mapSettingPath: String
@@ -171,7 +171,7 @@ class MapViewController: UIViewController
                     })
                     
                     //save the pin
-                    CoreDataStack.sharedInstance.saveMainContext()
+                    CoreDataStack.sharedInstance.save()
                     
                     //after the pin has been saved -- there is no longer a current pin
                     currentPin = nil
@@ -253,7 +253,7 @@ extension MapViewController : MKMapViewDelegate
                     sharedContext.delete(pin)
                     
                     //save the context
-                    CoreDataStack.sharedInstance.saveMainContext()
+                    CoreDataStack.sharedInstance.save()
                     
                     mapView.removeAnnotation(annotation)
                 }
