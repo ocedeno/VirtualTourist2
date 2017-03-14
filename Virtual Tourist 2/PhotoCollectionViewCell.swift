@@ -12,7 +12,7 @@ class PhotoCollectionViewCell: UICollectionViewCell
 {
     @IBOutlet weak var photoCellImageView: UIImageView!
     @IBOutlet weak var photoCellLoadingView: UIView!
-    {
+        {
         didSet
         {
             photoCellLoadingView.clipsToBounds = true
@@ -23,10 +23,8 @@ class PhotoCollectionViewCell: UICollectionViewCell
             photoCellLoadingView.addSubview(activityIndicatorView)
             activityIndicatorView.hidesWhenStopped = true
             activityIndicatorView.activityIndicatorViewStyle = .whiteLarge
-            performUIUpdatesOnMain
-                {
-                activityIndicatorView.startAnimating()
-                }
+            activityIndicatorView.startAnimating()
+            
         }
     }
 }
