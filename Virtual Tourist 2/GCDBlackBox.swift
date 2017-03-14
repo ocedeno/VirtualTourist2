@@ -11,7 +11,7 @@ import Foundation
 
 //Found on GitHub for assisting with placing events in the correct queue.
 func performUIUpdatesOnMain(_ updates:@escaping () -> Void ) {
-    DispatchQueue.main.async { () -> Void in
+    CoreDataStack.sharedInstance.mainContext.perform {
         updates()
     }
 }
