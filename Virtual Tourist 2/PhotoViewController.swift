@@ -33,7 +33,7 @@ class PhotoViewController: UIViewController
         super.viewDidLoad()
         
         mapView.isUserInteractionEnabled = false
-        photoCollectionView.backgroundColor = UIColor.white
+        //photoCollectionView.backgroundColor = UIColor.white
         photoCollectionView.delegate = self
         photoCollectionView.dataSource = self
         photoCollectionView.allowsMultipleSelection = true

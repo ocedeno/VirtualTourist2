@@ -19,9 +19,11 @@ class MapViewController: UIViewController
     var deleteButton: UIButton!
     var isMapEditing = false
     var buttonHeight: CGFloat = 0.0
+    
     //percentage of height for delete button in any orientation
     var buttonHeightConstant:CGFloat = 0.096
     var currentPin: MyPinAnnotation?
+    let flickrClient = FlickrClient()
     let utility = Utility()
     
     //MARK: - Shared Context
@@ -164,6 +166,9 @@ class MapViewController: UIViewController
                     pinEntity.latitude = (Float(pin.coordinate.latitude) as NSNumber?)!
                     pinEntity.longitude = (Float(pin.coordinate.longitude) as NSNumber?)!
                     pin.pin = pinEntity
+                    flickrClient.getPhotosByLocation(using: pin.pin!, completionHandler: { (result, error) in
+                        return
+                    })
                     
                     //save the pin
                     CoreDataStack.sharedInstance.saveMainContext()
