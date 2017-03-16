@@ -10,7 +10,7 @@ import MapKit
 
 class MyPinAnnotation: MKPointAnnotation
 {
-    var pin: PinAnnotation?
+    var pinAnnotation: PinAnnotation?
     
     override init()
     {
@@ -21,6 +21,6 @@ class MyPinAnnotation: MKPointAnnotation
     {
         super.init()
         
-        self.pin = pin
+        self.pinAnnotation = pin
     }
 }

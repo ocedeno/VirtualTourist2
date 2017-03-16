@@ -16,12 +16,8 @@ public class Photo: NSManagedObject
     {
         static let imageData = "imageData"
         static let dateCreated = "dateCreated"
+        static let mURL = "mURL"
     }
-    
-//    fileprivate var photosFilePath: String
-//    {
-//        return NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first!
-//    }
     
     override init(entity: NSEntityDescription, insertInto context: NSManagedObjectContext?)
     {
@@ -47,23 +43,20 @@ public class Photo: NSManagedObject
         
         super.init(entity: photoEntity, insertInto: context)
         
-        dateCreated = dictionary[Keys.dateCreated] as! Date as NSDate?
+        dateCreated = dictionary[Keys.dateCreated] as? NSDate
         imageData = dictionary[Keys.imageData] as? NSData
+        mURL = dictionary[Keys.mURL] as? String
     }
     
-//    override public func prepareForDeletion()
-//    {
-//        //delete photos from disk
-//         if let imageCoordinates = self.imageCoordinates
-//         {
-//            if FileManager.default.fileExists(atPath: URL(string: self.photosFilePath)!.appendingPathComponent(imageCoordinates).path) {
-//                do {
-//                    try FileManager.default.removeItem(atPath: URL(string: self.photosFilePath)!.appendingPathComponent(imageCoordinates).path)
-//                } catch {
-//                    let deleteError = error as NSError
-//                    print(deleteError)
-//                }
-//            }
-//        }
-//    }
+    init(insertInto context: NSManagedObjectContext?, mURL: String) {
+        
+        guard let photoEntity = NSEntityDescription.entity(forEntityName: "Photo", in: context!) else
+        {
+            fatalError("Could not create Photo Entity Description!")
+        }
+        
+        super.init(entity: photoEntity, insertInto: context)
+        
+        self.mURL = mURL
+    }
 }

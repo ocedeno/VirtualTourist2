@@ -12,16 +12,13 @@ import CoreData
 
 class PhotoViewController: UIViewController
 {
-    var pin: PinAnnotation?
-    var photoURLs: [String:Date]?
+    var passedPinAnnotation: PinAnnotation?
+    var photoSetCount: Int?
     let utility = Utility()
+    let flickrClient = FlickrClient()
     
     fileprivate var selectedPhotos:[IndexPath]?
     fileprivate var isFetching = false
-    //    fileprivate var photosFilePath: String
-    //    {
-    //        return NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first!
-    //    }
     
     @IBOutlet weak var mapView: MKMapView!
     @IBOutlet weak var photoCollectionView: UICollectionView!
@@ -39,7 +36,7 @@ class PhotoViewController: UIViewController
         photoCollectionView.allowsMultipleSelection = true
         
         //set Region
-        if let pin = self.pin
+        if let pin = self.passedPinAnnotation
         {
             let latitude = pin.latitude
             let longitude = pin.longitude
@@ -63,7 +60,7 @@ class PhotoViewController: UIViewController
         
         noPhotosLabel.isHidden = true
         
-        if (pin?.photos?.count)! <= 0 {
+        if photoSetCount ?? 0 <= 0 {
             newCollectionButton.isEnabled = false
             getPhotos()
         }
@@ -71,7 +68,7 @@ class PhotoViewController: UIViewController
     
     override func willAnimateRotation(to toInterfaceOrientation: UIInterfaceOrientation, duration: TimeInterval)
     {
-        if let pin = pin
+        if let pin = passedPinAnnotation
         {
             let latitude = pin.latitude as CLLocationDegrees
             let longitude = pin.longitude as CLLocationDegrees
@@ -104,10 +101,10 @@ class PhotoViewController: UIViewController
             let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Photo")
             
             //add a sort descriptor, enforces a sort order on the results
-            fetchRequest.sortDescriptors = [NSSortDescriptor(key: "dateCreated", ascending: false)]
+            fetchRequest.sortDescriptors = [NSSortDescriptor(key: "mURL", ascending: false)]
             
             //add a predicate to only get photos for the specified pin
-            if let latitude = self.pin?.latitude, let longitude = self.pin?.longitude {
+            if let latitude = self.passedPinAnnotation?.latitude, let longitude = self.passedPinAnnotation?.longitude {
                 let latitude = latitude as NSNumber
                 let longitude = longitude as NSNumber
                 let predicate = NSPredicate(format: "(pin.latitude == %@) AND (pin.longitude == %@)", latitude, longitude)
@@ -150,7 +147,7 @@ class PhotoViewController: UIViewController
     
     @IBAction func newCollectionSelected(_ sender: UIBarButtonItem)
     {
-        if (selectedPhotos?.count)! > 0
+        if photoSetCount ?? 0 > 0
         {
             photoCollectionView.performBatchUpdates(
                 { () -> Void in
@@ -169,10 +166,9 @@ class PhotoViewController: UIViewController
         } else
         {
             newCollectionButton.isEnabled = false
-            
             photoCollectionView.performBatchUpdates(
                 { () -> Void in
-                    if let pin = self.pin, let _ = pin.photos
+                    if let pin = self.passedPinAnnotation, let _ = pin.photos
                     {
                         self.isFetching = true
                         for photo in self.fetchedResultsController.fetchedObjects as! [Photo]
@@ -180,11 +176,7 @@ class PhotoViewController: UIViewController
                             self.sharedContext.delete(photo)
                         }
                         
-                        CoreDataStack.sharedInstance.persistingContext.perform
-                            {
-                                CoreDataStack.sharedInstance.save()
-                        }
-                        
+                        CoreDataStack.sharedInstance.save()
                     }
             }, completion:
                 { (completed) -> Void in
@@ -197,68 +189,55 @@ class PhotoViewController: UIViewController
     //MARK: - Get Photos from Flickr
     func getPhotos(fromCache cache:Bool = false)
     {
-        FlickrClient.sharedClient.getPhotosByLocation(using: pin!)
-        { (result, error) -> Void in
-            
+        photoSetCount = 0
+        
+        self.flickrClient.getPhotosByLocation(using: passedPinAnnotation!, completionHandler:
+        { (result, error) in
             guard error == nil else
             {
                 self.utility.createAlert(withTitle: "Failed Query", message: "Could not retrieve images for this pin location", sender: self as UIViewController)
                 return
             }
-            
-            if let photos = result {
+            if let photos = result
+            {
                 if let photosDict = photos["photos"] as? [String:AnyObject]
                 {
-                    if let photosDesc = photosDict["photo"] as? [[String:AnyObject]]
+                    if let photoArray = photosDict["photo"] as? [[String:AnyObject]]
                     {
-                        self.photoURLs = [String:Date]()
-                        let dateFormatter = DateFormatter()
-                        dateFormatter.dateFormat = "yyyy-MM-dd hh:mm:ss"
-                        for (_, photoItem) in photosDesc.enumerated()
+                        for item in photoArray
                         {
-                            if let photoURL = photoItem["url_m"] as? String, let dateTaken = photoItem["datetaken"] as? String
+                            if let photoURLM = item["url_m"]
                             {
-                                //photo urls of images to be downloaded
-                                self.photoURLs![photoURL] = dateFormatter.date(from: dateTaken)
+                                self.photoSetCount! += 1
+                                let photo = Photo(insertInto: self.sharedContext, mURL: photoURLM as! String)
+                                self.passedPinAnnotation?.photos?.adding(photo)
                             }
                         }
-                        
-                        if self.photoURLs!.keys.count > 0
-                        {
-                            background({ () -> Void in
-                                for urlString in self.photoURLs!.keys
-                                {
-                                    let photo = Photo(context: self.sharedContext)
-                                    let url = URL(string: urlString)
-                                    photo.imageData = NSData(contentsOf: url!)
-                                    photo.dateCreated = self.photoURLs![urlString]! as NSDate?
-                                    photo.pin = self.pin!
-                                    CoreDataStack.sharedInstance.persistingContext.perform
-                                        {
-                                            CoreDataStack.sharedInstance.save()
-                                    }
-                                }
-                                
-                                performUIUpdatesOnMain({ () -> Void in
-                                    self.photoCollectionView.isHidden = false
-                                    self.newCollectionButton.isEnabled = true
-                                    
-                                })
-                            })
-                        } else {
-                            performUIUpdatesOnMain({ () -> Void in
-                                self.photoCollectionView.isHidden = true
-                                self.newCollectionButton.isEnabled = true
-                                self.noPhotosLabel.isHidden = false
-                                
-                            })
+                        //save the pin
+                        handleManagedObjectContextOperations
+                            {
+                                CoreDataStack.sharedInstance.save()
+                                print("PhotoVC PhotoSentCount: \(self.photoSetCount)")
                         }
                     }
                 }
             }
-        }
+            if self.photoSetCount! > 0
+            {
+                performUIUpdatesOnMain({ () -> Void in
+                self.photoCollectionView.isHidden = false
+                self.newCollectionButton.isEnabled = true
+                })
+            } else {
+                performUIUpdatesOnMain({ () -> Void in
+                self.photoCollectionView.isHidden = true
+                self.newCollectionButton.isEnabled = true
+                self.noPhotosLabel.isHidden = false
+                })
+            }
+        })
     }
-    
+
 }
 
 extension PhotoViewController : UICollectionViewDelegate
@@ -326,12 +305,8 @@ extension PhotoViewController : UICollectionViewDataSource
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int
     {
-        if let sectionInfo = fetchedResultsController.sections
-        {
-            return sectionInfo[section].numberOfObjects
-        } else {
-            return 0
-        }
+        print("CollectionView PhotoSetCount: \(photoSetCount)")
+        return photoSetCount ?? 0
     }
     
     func numberOfSections(in collectionView: UICollectionView) -> Int
@@ -345,9 +320,10 @@ extension PhotoViewController : UICollectionViewDataSource
         
         let photo = fetchedResultsController.object(at: indexPath) as! Photo
         
-        if let _ = photo.imageData
+        if photo.imageData == nil
         {
-            cell.photoCellImageView.image = UIImage(data: photo.imageData as! Data)
+            photo.imageData = NSData(contentsOf: URL(string: photo.mURL!)!)
+            cell.photoCellImageView.image = UIImage(data: photo.imageData! as Data)
             cell.photoCellLoadingView.isHidden = true
         }
         else
@@ -355,6 +331,7 @@ extension PhotoViewController : UICollectionViewDataSource
             //if the file does not exist download it from the Internet and save it
             performUIUpdatesOnMain({ () -> Void in
                 self.getPhotos()
+                photo.imageData = NSData(contentsOf: URL(string: photo.mURL!)!)
                 cell.photoCellImageView.image = UIImage(data: photo.imageData as! Data)
                 cell.photoCellLoadingView.isHidden = true
             })

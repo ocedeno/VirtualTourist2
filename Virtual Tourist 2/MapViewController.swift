@@ -23,6 +23,7 @@ class MapViewController: UIViewController
     //percentage of height for delete button in any orientation
     var buttonHeightConstant:CGFloat = 0.096
     var currentPin: MyPinAnnotation?
+    var photoSetCount: Int = 0
     let flickrClient = FlickrClient()
     let utility = Utility()
     
@@ -30,16 +31,16 @@ class MapViewController: UIViewController
     lazy var sharedContext: NSManagedObjectContext =
         {
             CoreDataStack.sharedInstance.mainContext
-        }()
+    }()
     
     var mapSettingPath: String
-        {
-            let manager = FileManager.default
-            let url = manager.urls(for: .documentDirectory, in: .userDomainMask).first!
+    {
+        let manager = FileManager.default
+        let url = manager.urls(for: .documentDirectory, in: .userDomainMask).first!
         
-            return url.appendingPathComponent("mapset").path
-        }
-
+        return url.appendingPathComponent("mapset").path
+    }
+    
     override func viewDidLoad()
     {
         super.viewDidLoad()
@@ -56,7 +57,7 @@ class MapViewController: UIViewController
     }
     
     override func viewWillAppear(_ animated: Bool)
-     {
+    {
         super.viewWillAppear(animated)
         
         //reposition map region and span
@@ -160,32 +161,56 @@ class MapViewController: UIViewController
                 break
                 
             case .ended:
-                if let pin = self.currentPin
+                if let currentPin = self.currentPin
                 {
-                    background {
-                    
                     let pinEntity = PinAnnotation(context: self.sharedContext)
-                    pinEntity.latitude = (Float(pin.coordinate.latitude) as NSNumber?)!
-                    pinEntity.longitude = (Float(pin.coordinate.longitude) as NSNumber?)!
-                    pin.pin = pinEntity
-                    self.flickrClient.getPhotosByLocation(using: pin.pin!, completionHandler: { (result, error) in
-                        return
-                    })
-                    }
+                    pinEntity.latitude = (Float(currentPin.coordinate.latitude) as NSNumber?)!
+                    pinEntity.longitude = (Float(currentPin.coordinate.longitude) as NSNumber?)!
+                    currentPin.pinAnnotation = pinEntity
+                    try! sharedContext.save()
                     
-                    //save the pin
-                    CoreDataStack.sharedInstance.persistingContext.perform
+                    self.flickrClient.getPhotosByLocation(using: currentPin.pinAnnotation!, completionHandler:
+                    { (result, error) in
+                        guard error == nil else
                         {
-                    CoreDataStack.sharedInstance.save()
-                    }
-                    
-                    //after the pin has been saved -- there is no longer a current pin
-                    currentPin = nil
+                            self.utility.createAlert(withTitle: "Failed Query", message: "Could not retrieve images for this pin location", sender: self as UIViewController)
+                            return
+                        }
+            
+                        if let photos = result
+                        {
+                            if let photosDict = photos["photos"] as? [String:AnyObject]
+                            {
+                                if let photoArray = photosDict["photo"] as? [[String:AnyObject]]
+                                {
+                                    for item in photoArray
+                                    {
+                                        if let photoURL = item["url_m"]
+                                        {
+                                            let photo = Photo(insertInto: self.sharedContext, mURL: photoURL as! String)
+                                            currentPin.pinAnnotation?.photos?.adding(photo)
+                                            self.photoSetCount += 1
+                                        }
+                                    }
+                                    //save the pin
+                                    handleManagedObjectContextOperations
+                                    {
+                                        CoreDataStack.sharedInstance.save()
+                                        print("MapVC PhotoSetCount: \(self.photoSetCount)")
+                                    }
+                                }
+                            }
+                                        
+                        }
+                    })
                 }
-                break
-                
-            default:
-                break
+            //after the pin has been saved -- there is no longer a current pin
+            currentPin = nil
+            photoSetCount = 0
+            break
+            
+        default:
+            break
         }
     }
     
@@ -204,7 +229,7 @@ class MapViewController: UIViewController
                     let longitude = mapPin.longitude
                     pin.coordinate = CLLocationCoordinate2D(latitude: CLLocationDegrees(latitude), longitude: CLLocationDegrees(longitude))
                     
-                    pin.pin = mapPin
+                    pin.pinAnnotation = mapPin
                     mapView.addAnnotation(pin)
                 }
             }
@@ -214,13 +239,15 @@ class MapViewController: UIViewController
         }
     }
     
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?)
+    {
         if segue.identifier == "getPhotosSegue" {
             let destination = segue.destination as! PhotoViewController
             let annotation = sender as! MyPinAnnotation
             
-            if let pin = annotation.pin {
-                destination.pin = pin
+            if let pin = annotation.pinAnnotation {
+                destination.passedPinAnnotation = pin
+                destination.photoSetCount = photoSetCount
                 mapView.deselectAnnotation(annotation, animated: true)
             }
         }
@@ -254,14 +281,14 @@ extension MapViewController : MKMapViewDelegate
             //delete annotation
             if let annotation = view.annotation as? MyPinAnnotation
             {
-                if let pin = annotation.pin
+                if let pin = annotation.pinAnnotation
                 {
                     sharedContext.delete(pin)
                     
                     //save the context
                     CoreDataStack.sharedInstance.persistingContext.perform
-                        {
-                            CoreDataStack.sharedInstance.save()
+                    {
+                        CoreDataStack.sharedInstance.save()
                     }
                     
                     mapView.removeAnnotation(annotation)
@@ -272,7 +299,7 @@ extension MapViewController : MKMapViewDelegate
             //get images for pin location
             if let annotation = view.annotation as? MyPinAnnotation
             {
-                if let _ = annotation.pin
+                if let _ = annotation.pinAnnotation
                 {
                     performSegue(withIdentifier: "getPhotosSegue", sender: annotation)
                 }
