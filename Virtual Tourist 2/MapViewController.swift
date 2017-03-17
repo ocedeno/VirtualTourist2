@@ -183,21 +183,20 @@ class MapViewController: UIViewController
                             {
                                 if let photoArray = photosDict["photo"] as? [[String:AnyObject]]
                                 {
-                                    for item in photoArray
-                                    {
-                                        if let photoURL = item["url_m"]
+                                    handleManagedObjectContextOperations({
+                                        for item in photoArray
                                         {
-                                            let photo = Photo(insertInto: self.sharedContext, mURL: photoURL as! String)
-                                            currentPin.pinAnnotation?.photos?.adding(photo)
-                                            self.photoSetCount += 1
+                                            if let photoURL = item["url_m"]
+                                            {
+                                                let photo = Photo(insertInto: self.sharedContext, mURL: photoURL as! String)
+                                                currentPin.pinAnnotation?.photos?.adding(photo)
+                                                self.photoSetCount += 1
+                                            }
                                         }
-                                    }
                                     //save the pin
-                                    handleManagedObjectContextOperations
-                                    {
                                         CoreDataStack.sharedInstance.save()
                                         print("MapVC PhotoSetCount: \(self.photoSetCount)")
-                                    }
+                                    })
                                 }
                             }
                                         

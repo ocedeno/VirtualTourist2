@@ -206,19 +206,17 @@ class PhotoViewController: UIViewController
                     {
                         for item in photoArray
                         {
-                            if let photoURLM = item["url_m"]
-                            {
-                                self.photoSetCount! += 1
-                                let photo = Photo(insertInto: self.sharedContext, mURL: photoURLM as! String)
-                                self.passedPinAnnotation?.photos?.adding(photo)
-                            }
+                            handleManagedObjectContextOperations({
+                                if let photoURLM = item["url_m"]
+                                {
+                                    self.photoSetCount! += 1
+                                    let photo = Photo(insertInto: self.sharedContext, mURL: photoURLM as! String)
+                                    self.passedPinAnnotation?.photos?.adding(photo)
+                                }
+                            })
                         }
-                        //save the pin
-                        handleManagedObjectContextOperations
-                            {
-                                CoreDataStack.sharedInstance.save()
-                                print("PhotoVC PhotoSentCount: \(self.photoSetCount)")
-                        }
+                        CoreDataStack.sharedInstance.save()
+                        print("PhotoVC PhotoSentCount: \(self.photoSetCount)")
                     }
                 }
             }
@@ -322,9 +320,11 @@ extension PhotoViewController : UICollectionViewDataSource
         
         if photo.imageData == nil
         {
-            photo.imageData = NSData(contentsOf: URL(string: photo.mURL!)!)
-            cell.photoCellImageView.image = UIImage(data: photo.imageData! as Data)
-            cell.photoCellLoadingView.isHidden = true
+            performUIUpdatesOnMain({ () -> Void in
+                photo.imageData = NSData(contentsOf: URL(string: photo.mURL!)!)
+                cell.photoCellImageView.image = UIImage(data: photo.imageData! as Data)
+                cell.photoCellLoadingView.isHidden = true
+            })
         }
         else
         {
