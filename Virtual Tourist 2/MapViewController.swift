@@ -143,66 +143,68 @@ class MapViewController: UIViewController
         
         switch longPressGesture.state
         {
-            case .began:
-                currentPin = MyPinAnnotation()
+        case .began:
+            currentPin = MyPinAnnotation()
+            let touchCoord = longPressGesture.location(in: mapView)
+            currentPin!.coordinate = mapView.convert(touchCoord, toCoordinateFrom: mapView)
+            mapView.addAnnotation(currentPin!)
+            
+            break
+            
+        case .changed:
+            if let pin = currentPin
+            {
                 let touchCoord = longPressGesture.location(in: mapView)
-                currentPin!.coordinate = mapView.convert(touchCoord, toCoordinateFrom: mapView)
-                mapView.addAnnotation(currentPin!)
+                pin.coordinate = mapView.convert(touchCoord, toCoordinateFrom: mapView)
+            }
+            
+            break
+            
+        case .ended:
+            if let currentPin = self.currentPin
+            {
+                let pinEntity = PinAnnotation(context: self.sharedContext)
+                pinEntity.latitude = (Float(currentPin.coordinate.latitude) as NSNumber?)!
+                pinEntity.longitude = (Float(currentPin.coordinate.longitude) as NSNumber?)!
+                currentPin.pinAnnotation = pinEntity
+                try! sharedContext.save()
                 
-                break
-                
-            case .changed:
-                if let pin = currentPin
-                {
-                    let touchCoord = longPressGesture.location(in: mapView)
-                    pin.coordinate = mapView.convert(touchCoord, toCoordinateFrom: mapView)
-                }
-                
-                break
-                
-            case .ended:
-                if let currentPin = self.currentPin
-                {
-                    let pinEntity = PinAnnotation(context: self.sharedContext)
-                    pinEntity.latitude = (Float(currentPin.coordinate.latitude) as NSNumber?)!
-                    pinEntity.longitude = (Float(currentPin.coordinate.longitude) as NSNumber?)!
-                    currentPin.pinAnnotation = pinEntity
-                    try! sharedContext.save()
-                    
-                    self.flickrClient.getPhotosByLocation(using: currentPin.pinAnnotation!, completionHandler:
+                self.flickrClient.getPhotosByLocation(using: currentPin.pinAnnotation!, completionHandler:
                     { (result, error) in
                         guard error == nil else
                         {
-                            self.utility.createAlert(withTitle: "Failed Query", message: "Could not retrieve images for this pin location", sender: self as UIViewController)
+                            DispatchQueue.main.async
+                                {
+                                    self.utility.createAlert(withTitle: "Failed Query", message: "Could not retrieve images for this pin location", sender: self as UIViewController)
+                            }
                             return
                         }
-            
+                        
                         if let photos = result
                         {
                             if let photosDict = photos["photos"] as? [String:AnyObject]
                             {
                                 if let photoArray = photosDict["photo"] as? [[String:AnyObject]]
                                 {
-                                    handleManagedObjectContextOperations({
-                                        for item in photoArray
+                                    
+                                    for item in photoArray
+                                    {
+                                        if let photoURL = item["url_m"]
                                         {
-                                            if let photoURL = item["url_m"]
-                                            {
+                                            DispatchQueue.main.async{
                                                 let photo = Photo(insertInto: self.sharedContext, mURL: photoURL as! String)
                                                 currentPin.pinAnnotation?.photos?.adding(photo)
+                                                try! self.sharedContext.save()
                                                 self.photoSetCount += 1
                                             }
                                         }
-                                    //save the pin
-                                        CoreDataStack.sharedInstance.save()
-                                        print("MapVC PhotoSetCount: \(self.photoSetCount)")
-                                    })
+                                    }
                                 }
                             }
-                                        
+                            
                         }
-                    })
-                }
+                })
+            }
             //after the pin has been saved -- there is no longer a current pin
             currentPin = nil
             photoSetCount = 0
@@ -286,8 +288,8 @@ extension MapViewController : MKMapViewDelegate
                     
                     //save the context
                     CoreDataStack.sharedInstance.persistingContext.perform
-                    {
-                        CoreDataStack.sharedInstance.save()
+                        {
+                            CoreDataStack.sharedInstance.save()
                     }
                     
                     mapView.removeAnnotation(annotation)

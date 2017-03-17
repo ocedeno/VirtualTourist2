@@ -206,16 +206,16 @@ class PhotoViewController: UIViewController
                     {
                         for item in photoArray
                         {
-                            handleManagedObjectContextOperations({
-                                if let photoURLM = item["url_m"]
-                                {
-                                    self.photoSetCount! += 1
-                                    let photo = Photo(insertInto: self.sharedContext, mURL: photoURLM as! String)
+                            if let photoURL = item["url_m"]
+                            {
+                                DispatchQueue.main.async{
+                                    let photo = Photo(insertInto: self.sharedContext, mURL: photoURL as! String)
                                     self.passedPinAnnotation?.photos?.adding(photo)
+                                    try! self.sharedContext.save()
+                                    self.photoSetCount = self.photoSetCount! + 1
                                 }
-                            })
+                            }
                         }
-                        CoreDataStack.sharedInstance.save()
                         print("PhotoVC PhotoSentCount: \(self.photoSetCount)")
                     }
                 }
@@ -297,7 +297,6 @@ extension PhotoViewController : UICollectionViewDataSource
                 })
             }
         }
-        
         return cell
     }
     
@@ -320,11 +319,9 @@ extension PhotoViewController : UICollectionViewDataSource
         
         if photo.imageData == nil
         {
-            performUIUpdatesOnMain({ () -> Void in
                 photo.imageData = NSData(contentsOf: URL(string: photo.mURL!)!)
                 cell.photoCellImageView.image = UIImage(data: photo.imageData! as Data)
                 cell.photoCellLoadingView.isHidden = true
-            })
         }
         else
         {
