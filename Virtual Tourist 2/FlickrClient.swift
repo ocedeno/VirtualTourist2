@@ -204,7 +204,10 @@ class FlickrClient
                             let userInfo = [NSLocalizedDescriptionKey : "Could not parse the data as json"]
                             handler(nil, NSError(domain: "convertDataWithCompletionHandler", code: -1, userInfo: userInfo))
                         }
-                        handler(parsedResult, nil)
+                        DispatchQueue.main.async
+                        {
+                            handler(parsedResult, nil)
+                        }
                     }
                 }
                 

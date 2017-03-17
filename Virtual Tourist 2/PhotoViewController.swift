@@ -13,7 +13,6 @@ import CoreData
 class PhotoViewController: UIViewController
 {
     var passedPinAnnotation: PinAnnotation?
-    var photoSetCount: Int?
     let utility = Utility()
     let flickrClient = FlickrClient()
     
@@ -60,7 +59,7 @@ class PhotoViewController: UIViewController
         
         noPhotosLabel.isHidden = true
         
-        if photoSetCount ?? 0 <= 0 {
+        if passedPinAnnotation?.photos?.count ?? 0 <= 0 {
             newCollectionButton.isEnabled = false
             getPhotos()
         }
@@ -139,15 +138,15 @@ class PhotoViewController: UIViewController
                 let photo = self.fetchedResultsController.object(at: indexPath) as! Photo
                 self.sharedContext.delete(photo)
                 CoreDataStack.sharedInstance.persistingContext.perform
-                    {
-                        CoreDataStack.sharedInstance.save()
+                {
+                    try! self.sharedContext.save()
                 }
         }
     }
     
     @IBAction func newCollectionSelected(_ sender: UIBarButtonItem)
     {
-        if photoSetCount ?? 0 > 0
+        if fetchedResultsController.fetchedObjects?.count ?? 0 > 0
         {
             photoCollectionView.performBatchUpdates(
                 { () -> Void in
@@ -176,7 +175,7 @@ class PhotoViewController: UIViewController
                             self.sharedContext.delete(photo)
                         }
                         
-                        CoreDataStack.sharedInstance.save()
+                        try! self.sharedContext.save()
                     }
             }, completion:
                 { (completed) -> Void in
@@ -189,8 +188,6 @@ class PhotoViewController: UIViewController
     //MARK: - Get Photos from Flickr
     func getPhotos(fromCache cache:Bool = false)
     {
-        photoSetCount = 0
-        
         self.flickrClient.getPhotosByLocation(using: passedPinAnnotation!, completionHandler:
         { (result, error) in
             guard error == nil else
@@ -198,40 +195,42 @@ class PhotoViewController: UIViewController
                 self.utility.createAlert(withTitle: "Failed Query", message: "Could not retrieve images for this pin location", sender: self as UIViewController)
                 return
             }
+            
             if let photos = result
             {
                 if let photosDict = photos["photos"] as? [String:AnyObject]
                 {
                     if let photoArray = photosDict["photo"] as? [[String:AnyObject]]
                     {
+                        var photoSetArray = [String?]()
                         for item in photoArray
                         {
                             if let photoURL = item["url_m"]
                             {
-                                DispatchQueue.main.async{
-                                    let photo = Photo(insertInto: self.sharedContext, mURL: photoURL as! String)
-                                    self.passedPinAnnotation?.photos?.adding(photo)
-                                    try! self.sharedContext.save()
-                                    self.photoSetCount = self.photoSetCount! + 1
+                                DispatchQueue.main.async
+                                {
+                                    photoSetArray.append((photoURL as? String)!)
+                                    let photoEntity = Photo(context: self.sharedContext)
+                                    photoEntity.mURL = photoURL as? String
+                                    self.passedPinAnnotation?.photos?.adding(photoEntity)
                                 }
                             }
                         }
-                        print("PhotoVC PhotoSentCount: \(self.photoSetCount)")
+                        if photoSetArray.count > 0
+                        {
+                            performUIUpdatesOnMain({ () -> Void in
+                                self.photoCollectionView.isHidden = false
+                                self.newCollectionButton.isEnabled = true
+                            })
+                        } else {
+                            performUIUpdatesOnMain({ () -> Void in
+                                self.photoCollectionView.isHidden = true
+                                self.newCollectionButton.isEnabled = true
+                                self.noPhotosLabel.isHidden = false
+                            })
+                        }
                     }
                 }
-            }
-            if self.photoSetCount! > 0
-            {
-                performUIUpdatesOnMain({ () -> Void in
-                self.photoCollectionView.isHidden = false
-                self.newCollectionButton.isEnabled = true
-                })
-            } else {
-                performUIUpdatesOnMain({ () -> Void in
-                self.photoCollectionView.isHidden = true
-                self.newCollectionButton.isEnabled = true
-                self.noPhotosLabel.isHidden = false
-                })
             }
         })
     }
@@ -302,8 +301,8 @@ extension PhotoViewController : UICollectionViewDataSource
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int
     {
-        print("CollectionView PhotoSetCount: \(photoSetCount)")
-        return photoSetCount ?? 0
+        loadFetchedResultsController()
+        return fetchedResultsController.fetchedObjects?.count ?? 0
     }
     
     func numberOfSections(in collectionView: UICollectionView) -> Int

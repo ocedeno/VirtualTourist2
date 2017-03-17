@@ -23,7 +23,7 @@ class MapViewController: UIViewController
     //percentage of height for delete button in any orientation
     var buttonHeightConstant:CGFloat = 0.096
     var currentPin: MyPinAnnotation?
-    var photoSetCount: Int = 0
+    var photoSetArray: [String] = []
     let flickrClient = FlickrClient()
     let utility = Utility()
     
@@ -163,7 +163,7 @@ class MapViewController: UIViewController
         case .ended:
             if let currentPin = self.currentPin
             {
-                let pinEntity = PinAnnotation(context: self.sharedContext)
+                let pinEntity = PinAnnotation(context: sharedContext)
                 pinEntity.latitude = (Float(currentPin.coordinate.latitude) as NSNumber?)!
                 pinEntity.longitude = (Float(currentPin.coordinate.longitude) as NSNumber?)!
                 currentPin.pinAnnotation = pinEntity
@@ -174,8 +174,8 @@ class MapViewController: UIViewController
                         guard error == nil else
                         {
                             DispatchQueue.main.async
-                                {
-                                    self.utility.createAlert(withTitle: "Failed Query", message: "Could not retrieve images for this pin location", sender: self as UIViewController)
+                            {
+                                self.utility.createAlert(withTitle: "Failed Query", message: "Could not retrieve images for this pin location", sender: self as UIViewController)
                             }
                             return
                         }
@@ -191,23 +191,21 @@ class MapViewController: UIViewController
                                     {
                                         if let photoURL = item["url_m"]
                                         {
-                                            DispatchQueue.main.async{
-                                                let photo = Photo(insertInto: self.sharedContext, mURL: photoURL as! String)
-                                                currentPin.pinAnnotation?.photos?.adding(photo)
-                                                try! self.sharedContext.save()
-                                                self.photoSetCount += 1
+                                            DispatchQueue.main.async
+                                            {
+                                                self.photoSetArray.append((photoURL as? String)!)
+                                                let photoEntity = Photo(context: self.sharedContext)
+                                                photoEntity.mURL = photoURL as? String
+                                                currentPin.pinAnnotation?.photos?.adding(photoEntity)
                                             }
                                         }
                                     }
                                 }
                             }
-                            
                         }
                 })
             }
-            //after the pin has been saved -- there is no longer a current pin
             currentPin = nil
-            photoSetCount = 0
             break
             
         default:
@@ -248,7 +246,6 @@ class MapViewController: UIViewController
             
             if let pin = annotation.pinAnnotation {
                 destination.passedPinAnnotation = pin
-                destination.photoSetCount = photoSetCount
                 mapView.deselectAnnotation(annotation, animated: true)
             }
         }
