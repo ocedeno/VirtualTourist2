@@ -29,7 +29,6 @@ class PhotoViewController: UIViewController
         super.viewDidLoad()
         
         mapView.isUserInteractionEnabled = false
-        photoCollectionView.backgroundColor = UIColor.white
         photoCollectionView.delegate = self
         photoCollectionView.dataSource = self
         photoCollectionView.allowsMultipleSelection = true
@@ -49,6 +48,7 @@ class PhotoViewController: UIViewController
             mapView.addAnnotation(pinMarker)
         }
         
+        loadFetchedResultsController()
         selectedPhotos = [IndexPath]()
     }
     
@@ -57,7 +57,6 @@ class PhotoViewController: UIViewController
         super.viewWillAppear(animated)
         
         noPhotosLabel.isHidden = true
-        
         if passedPinAnnotation?.photos?.count ?? 0 <= 0 {
             newCollectionButton.isEnabled = false
             getPhotos()
@@ -99,7 +98,7 @@ class PhotoViewController: UIViewController
             let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Photo")
             
             //add a sort descriptor, enforces a sort order on the results
-            fetchRequest.sortDescriptors = [NSSortDescriptor(key: "mURL", ascending: false)]
+            fetchRequest.sortDescriptors = []
             
             //add a predicate to only get photos for the specified pin
             if let latitude = self.passedPinAnnotation?.latitude, let longitude = self.passedPinAnnotation?.longitude {
@@ -145,7 +144,7 @@ class PhotoViewController: UIViewController
     
     @IBAction func newCollectionSelected(_ sender: UIBarButtonItem)
     {
-        if fetchedResultsController.fetchedObjects?.count ?? 0 > 0
+        if newCollectionButton.title == "Remove Selected Photos"
         {
             photoCollectionView.performBatchUpdates(
                 { () -> Void in
@@ -180,6 +179,7 @@ class PhotoViewController: UIViewController
                 { (completed) -> Void in
                     self.isFetching = false
                     self.getPhotos()
+                    self.photoCollectionView.reloadData()
             })
         }
     }
@@ -207,7 +207,6 @@ class PhotoViewController: UIViewController
                             {
                                 DispatchQueue.main.async
                                 {
-//                                    photoSetAfrray.append(photoURL as! String)
                                     let photoEntity = Photo(context: self.sharedContext)
                                     photoEntity.mURL = photoURL as? String
                                     photoEntity.pin = self.passedPinAnnotation
@@ -302,7 +301,6 @@ extension PhotoViewController : UICollectionViewDataSource
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int
     {
-        loadFetchedResultsController()
         return fetchedResultsController.fetchedObjects?.count ?? 0
     }
     
@@ -319,16 +317,18 @@ extension PhotoViewController : UICollectionViewDataSource
         
         if photo.imageData == nil
         {
+            performUIUpdatesOnMain
+            {
                 photo.imageData = NSData(contentsOf: URL(string: photo.mURL!)!)
                 cell.photoCellImageView.image = UIImage(data: photo.imageData! as Data)
                 cell.photoCellLoadingView.isHidden = true
+                try! self.sharedContext.save()
+            }
         }
         else
         {
             //if the file does not exist download it from the Internet and save it
             performUIUpdatesOnMain({ () -> Void in
-                self.getPhotos()
-                photo.imageData = NSData(contentsOf: URL(string: photo.mURL!)!)
                 cell.photoCellImageView.image = UIImage(data: photo.imageData as! Data)
                 cell.photoCellLoadingView.isHidden = true
             })
