@@ -49,7 +49,6 @@ class PhotoViewController: UIViewController
             mapView.addAnnotation(pinMarker)
         }
         
-        loadFetchedResultsController()
         selectedPhotos = [IndexPath]()
     }
     
@@ -202,21 +201,23 @@ class PhotoViewController: UIViewController
                 {
                     if let photoArray = photosDict["photo"] as? [[String:AnyObject]]
                     {
-                        var photoSetArray = [String?]()
                         for item in photoArray
                         {
                             if let photoURL = item["url_m"]
                             {
                                 DispatchQueue.main.async
                                 {
-                                    photoSetArray.append((photoURL as? String)!)
+//                                    photoSetAfrray.append(photoURL as! String)
                                     let photoEntity = Photo(context: self.sharedContext)
                                     photoEntity.mURL = photoURL as? String
+                                    photoEntity.pin = self.passedPinAnnotation
                                     self.passedPinAnnotation?.photos?.adding(photoEntity)
+                                    try! self.sharedContext.save()
                                 }
                             }
                         }
-                        if photoSetArray.count > 0
+                        
+                        if (self.fetchedResultsController.fetchedObjects?.count)! > 0
                         {
                             performUIUpdatesOnMain({ () -> Void in
                                 self.photoCollectionView.isHidden = false

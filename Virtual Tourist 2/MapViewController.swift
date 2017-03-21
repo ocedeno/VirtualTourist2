@@ -23,7 +23,6 @@ class MapViewController: UIViewController
     //percentage of height for delete button in any orientation
     var buttonHeightConstant:CGFloat = 0.096
     var currentPin: MyPinAnnotation?
-    var photoSetArray: [String] = []
     let flickrClient = FlickrClient()
     let utility = Utility()
     
@@ -167,7 +166,6 @@ class MapViewController: UIViewController
                 pinEntity.latitude = (Float(currentPin.coordinate.latitude) as NSNumber?)!
                 pinEntity.longitude = (Float(currentPin.coordinate.longitude) as NSNumber?)!
                 currentPin.pinAnnotation = pinEntity
-                try! sharedContext.save()
                 
                 self.flickrClient.getPhotosByLocation(using: currentPin.pinAnnotation!, completionHandler:
                     { (result, error) in
@@ -186,17 +184,17 @@ class MapViewController: UIViewController
                             {
                                 if let photoArray = photosDict["photo"] as? [[String:AnyObject]]
                                 {
-                                    
                                     for item in photoArray
                                     {
                                         if let photoURL = item["url_m"]
                                         {
-                                            DispatchQueue.main.async
+                                            self.sharedContext.perform
                                             {
-                                                self.photoSetArray.append((photoURL as? String)!)
                                                 let photoEntity = Photo(context: self.sharedContext)
                                                 photoEntity.mURL = photoURL as? String
-                                                currentPin.pinAnnotation?.photos?.adding(photoEntity)
+                                                photoEntity.pin = self.currentPin?.pinAnnotation
+                                                self.currentPin?.pinAnnotation?.photos?.adding(photoEntity)
+                                                try! self.sharedContext.save()
                                             }
                                         }
                                     }
@@ -205,7 +203,6 @@ class MapViewController: UIViewController
                         }
                 })
             }
-            currentPin = nil
             break
             
         default:

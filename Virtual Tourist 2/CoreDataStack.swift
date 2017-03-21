@@ -36,6 +36,7 @@ class CoreDataStack : NSObject
             
             //location on disk of the actual persistent store
             let persistentStoreURL = applicationDocumentsDirectory.appendingPathComponent("\(moduleName).sqlite")
+            print(persistentStoreURL)
             
             //add the persistent store to the persistent store coordinator
             do {
