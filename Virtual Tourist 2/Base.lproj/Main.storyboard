@@ -94,7 +94,16 @@
                                                         </imageView>
                                                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Isa-fQ-JTy" userLabel="Loading View">
                                                             <rect key="frame" x="8" y="8" width="98" height="90"/>
+                                                            <subviews>
+                                                                <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" style="whiteLarge" translatesAutoresizingMaskIntoConstraints="NO" id="7ap-uC-OrW">
+                                                                    <rect key="frame" x="31" y="27" width="37" height="37"/>
+                                                                </activityIndicatorView>
+                                                            </subviews>
                                                             <color key="backgroundColor" red="0.26866786617434235" green="0.83568061337405819" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                            <constraints>
+                                                                <constraint firstItem="7ap-uC-OrW" firstAttribute="centerY" secondItem="Isa-fQ-JTy" secondAttribute="centerY" id="ArD-T8-pf6"/>
+                                                                <constraint firstItem="7ap-uC-OrW" firstAttribute="centerX" secondItem="Isa-fQ-JTy" secondAttribute="centerX" id="Jen-ah-RcI"/>
+                                                            </constraints>
                                                         </view>
                                                     </subviews>
                                                 </view>
@@ -109,6 +118,7 @@
                                                     <constraint firstAttribute="bottomMargin" secondItem="wYb-68-wQW" secondAttribute="bottom" constant="-8" id="xKo-ac-AP5"/>
                                                 </constraints>
                                                 <connections>
+                                                    <outlet property="activityIndicatorView" destination="7ap-uC-OrW" id="zbt-y0-qCH"/>
                                                     <outlet property="photoCellImageView" destination="wYb-68-wQW" id="YSf-W7-XM1"/>
                                                     <outlet property="photoCellLoadingView" destination="Isa-fQ-JTy" id="DUL-OO-ztE"/>
                                                 </connections>

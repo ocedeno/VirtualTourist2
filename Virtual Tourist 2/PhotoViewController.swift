@@ -79,7 +79,7 @@ class PhotoViewController: UIViewController
     {
         super.viewWillLayoutSubviews()
         
-        let width = view.frame.width / 4
+        let width = view.frame.width / 3.2
         let layout = photoCollectionView.collectionViewLayout as! UICollectionViewFlowLayout
         layout.itemSize = CGSize(width: width + 1, height: width + 1)
         
@@ -135,16 +135,15 @@ class PhotoViewController: UIViewController
             { () -> Void in
                 let photo = self.fetchedResultsController.object(at: indexPath) as! Photo
                 self.sharedContext.delete(photo)
-                CoreDataStack.sharedInstance.persistingContext.perform
-                {
+                performUIUpdatesOnMain({ 
                     try! self.sharedContext.save()
-                }
+                })
         }
     }
     
     @IBAction func newCollectionSelected(_ sender: UIBarButtonItem)
     {
-        if newCollectionButton.title == "Remove Selected Photos"
+        if sender.title == "Remove Selected Pictures"
         {
             photoCollectionView.performBatchUpdates(
                 { () -> Void in
@@ -158,6 +157,7 @@ class PhotoViewController: UIViewController
                     self.photoCollectionView.deleteItems(at: self.selectedPhotos!)
                     self.selectedPhotos?.removeAll()
                     self.newCollectionButton.title = "New Collection"
+                    print("Completion Handler of the New Collection Button if statement")
                 })
             })
         } else
@@ -177,9 +177,12 @@ class PhotoViewController: UIViewController
                     }
             }, completion:
                 { (completed) -> Void in
-                    self.isFetching = false
-                    self.getPhotos()
-                    self.photoCollectionView.reloadData()
+                    performUIUpdatesOnMain
+                    {
+                        self.getPhotos()
+                        self.isFetching = false
+                        print("Completion Handler of the New Collection Button else statement")
+                    }
             })
         }
     }
@@ -216,11 +219,12 @@ class PhotoViewController: UIViewController
                             }
                         }
                         
-                        if (self.fetchedResultsController.fetchedObjects?.count)! > 0
+                        if (self.passedPinAnnotation?.photos?.count)! > 0
                         {
                             performUIUpdatesOnMain({ () -> Void in
                                 self.photoCollectionView.isHidden = false
                                 self.newCollectionButton.isEnabled = true
+                                self.photoCollectionView.reloadData()
                             })
                         } else {
                             performUIUpdatesOnMain({ () -> Void in
@@ -301,18 +305,14 @@ extension PhotoViewController : UICollectionViewDataSource
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int
     {
-        return fetchedResultsController.fetchedObjects?.count ?? 0
-    }
-    
-    func numberOfSections(in collectionView: UICollectionView) -> Int
-    {
-        return 1
+        return (fetchedResultsController.fetchedObjects?.count)!
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell
     {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "photoCell", for: indexPath) as! PhotoCollectionViewCell
         
+        loadFetchedResultsController()
         let photo = fetchedResultsController.object(at: indexPath) as! Photo
         
         if photo.imageData == nil
