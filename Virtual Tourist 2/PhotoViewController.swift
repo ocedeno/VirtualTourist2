@@ -163,6 +163,7 @@ class PhotoViewController: UIViewController
         } else
         {
             newCollectionButton.isEnabled = false
+            print("\n1 - Above the PerformBatchUpdates")
             photoCollectionView.performBatchUpdates(
                 { () -> Void in
                     if let pin = self.passedPinAnnotation, let _ = pin.photos
@@ -174,17 +175,24 @@ class PhotoViewController: UIViewController
                         }
                         
                         try! self.sharedContext.save()
+                        print("\n1.5 - End of Save ")
                     }
             }, completion:
                 { (completed) -> Void in
-                    performUIUpdatesOnMain
-                    {
+                    print("\n2 - Above Completion Handler in Else")
+                    performUIUpdatesOnMain({
                         self.getPhotos()
                         self.isFetching = false
                         print("Completion Handler of the New Collection Button else statement")
-                    }
+                    })
             })
+            print("\n3 - Above Get Photos")
+            self.getPhotos()
+            self.isFetching = false
+            print("Completion Handler of the New Collection Button else statement")
+
         }
+        print("\n4 - Above The End")
     }
     
     //MARK: - Get Photos from Flickr
