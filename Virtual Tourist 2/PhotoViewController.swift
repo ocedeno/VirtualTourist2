@@ -174,23 +174,19 @@ class PhotoViewController: UIViewController
                             self.sharedContext.delete(photo)
                         }
                         
-                        try! self.sharedContext.save()
+                        performUIUpdatesOnMain({
+                            try! self.sharedContext.save()
+                        })
                         print("\n1.5 - End of Save ")
                     }
-            }, completion:
-                { (completed) -> Void in
-                    print("\n2 - Above Completion Handler in Else")
-                    performUIUpdatesOnMain({
-                        self.getPhotos()
-                        self.isFetching = false
-                        print("Completion Handler of the New Collection Button else statement")
-                    })
+            }, completion: { (completed) -> Void in
+                print("\n2 - Above Completion Handler in Else")
+                performUIUpdatesOnMain({ () -> Void in
+                    self.getPhotos()
+                    self.loadFetchedResultsController()
+                    self.isFetching = false
+                })
             })
-            print("\n3 - Above Get Photos")
-            self.getPhotos()
-            self.isFetching = false
-            print("Completion Handler of the New Collection Button else statement")
-
         }
         print("\n4 - Above The End")
     }
@@ -219,6 +215,7 @@ class PhotoViewController: UIViewController
                                 DispatchQueue.main.async
                                 {
                                     let photoEntity = Photo(context: self.sharedContext)
+                                    print("Photo URL Added in GetPhotos")
                                     photoEntity.mURL = photoURL as? String
                                     photoEntity.pin = self.passedPinAnnotation
                                     self.passedPinAnnotation?.photos?.adding(photoEntity)
