@@ -163,7 +163,6 @@ class PhotoViewController: UIViewController
         } else
         {
             newCollectionButton.isEnabled = false
-            print("\n1 - Above the PerformBatchUpdates")
             photoCollectionView.performBatchUpdates(
                 { () -> Void in
                     if let pin = self.passedPinAnnotation, let _ = pin.photos
@@ -177,18 +176,12 @@ class PhotoViewController: UIViewController
                         performUIUpdatesOnMain({
                             try! self.sharedContext.save()
                         })
-                        print("\n1.5 - End of Save ")
                     }
             }, completion: { (completed) -> Void in
                 print("\n2 - Above Completion Handler in Else")
-                performUIUpdatesOnMain({ () -> Void in
                     self.getPhotos()
-                    self.loadFetchedResultsController()
-                    self.isFetching = false
-                })
             })
         }
-        print("\n4 - Above The End")
     }
     
     //MARK: - Get Photos from Flickr
@@ -220,11 +213,12 @@ class PhotoViewController: UIViewController
                                     photoEntity.pin = self.passedPinAnnotation
                                     self.passedPinAnnotation?.photos?.adding(photoEntity)
                                     try! self.sharedContext.save()
+                                    self.loadFetchedResultsController()
                                 }
                             }
                         }
                         
-                        if (self.passedPinAnnotation?.photos?.count)! > 0
+                        if (photoArray.count) > 0
                         {
                             performUIUpdatesOnMain({ () -> Void in
                                 self.photoCollectionView.isHidden = false
