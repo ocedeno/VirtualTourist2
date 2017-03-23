@@ -157,7 +157,6 @@ class PhotoViewController: UIViewController
                     self.photoCollectionView.deleteItems(at: self.selectedPhotos!)
                     self.selectedPhotos?.removeAll()
                     self.newCollectionButton.title = "New Collection"
-                    print("Completion Handler of the New Collection Button if statement")
                 })
             })
         } else
@@ -178,7 +177,6 @@ class PhotoViewController: UIViewController
                         })
                     }
             }, completion: { (completed) -> Void in
-                print("\n2 - Above Completion Handler in Else")
                     self.getPhotos()
             })
         }
@@ -316,18 +314,12 @@ extension PhotoViewController : UICollectionViewDataSource
         if photo.imageData == nil
         {
             cell.photoCellImageView.downloadedFrom(link: photo.mURL!)
-            DispatchQueue.main.async {
-                //cell.photoCellLoadingView.isHidden = true
-            }
             try! self.sharedContext.save()
         }
         else
         {
             //if the file does not exist download it from the Internet and save it
             cell.photoCellImageView.downloadedFrom(link: photo.mURL!)
-            performUIUpdatesOnMain({ () -> Void in
-                cell.photoCellLoadingView.isHidden = true
-            })
         }
         
         return configure(cell, forRowAtIndexPath: indexPath)
