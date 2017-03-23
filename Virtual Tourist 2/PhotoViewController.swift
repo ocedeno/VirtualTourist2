@@ -208,11 +208,9 @@ class PhotoViewController: UIViewController
                                 DispatchQueue.main.async
                                 {
                                     let photoEntity = Photo(context: self.sharedContext)
-                                    print("Photo URL Added in GetPhotos")
                                     photoEntity.mURL = photoURL as? String
                                     photoEntity.pin = self.passedPinAnnotation
                                     self.passedPinAnnotation?.photos?.adding(photoEntity)
-                                    try! self.sharedContext.save()
                                     self.loadFetchedResultsController()
                                 }
                             }
@@ -236,6 +234,7 @@ class PhotoViewController: UIViewController
                 }
             }
         })
+        try! self.sharedContext.save()
     }
 
 }
@@ -316,19 +315,17 @@ extension PhotoViewController : UICollectionViewDataSource
         
         if photo.imageData == nil
         {
-            photo.imageData = NSData(contentsOf: URL(string: photo.mURL!)!)
-            try! self.sharedContext.save()
-            performUIUpdatesOnMain
-            {
-                cell.photoCellImageView.image = UIImage(data: photo.imageData! as Data)
-                cell.photoCellLoadingView.isHidden = true
+            cell.photoCellImageView.downloadedFrom(link: photo.mURL!)
+            DispatchQueue.main.async {
+                //cell.photoCellLoadingView.isHidden = true
             }
+            try! self.sharedContext.save()
         }
         else
         {
             //if the file does not exist download it from the Internet and save it
+            cell.photoCellImageView.downloadedFrom(link: photo.mURL!)
             performUIUpdatesOnMain({ () -> Void in
-                cell.photoCellImageView.image = UIImage(data: photo.imageData as! Data)
                 cell.photoCellLoadingView.isHidden = true
             })
         }
@@ -337,7 +334,8 @@ extension PhotoViewController : UICollectionViewDataSource
     }
 }
 
-extension PhotoViewController : NSFetchedResultsControllerDelegate {
+extension PhotoViewController : NSFetchedResultsControllerDelegate
+{
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
         switch type {
         case .delete:
@@ -353,5 +351,28 @@ extension PhotoViewController : NSFetchedResultsControllerDelegate {
         default:
             return
         }
+    }
+}
+
+extension UIImageView
+{
+    func downloadedFrom(url: URL, contentMode mode: UIViewContentMode = .scaleAspectFill) {
+        contentMode = mode
+        URLSession.shared.dataTask(with: url) { (data, response, error) in
+            guard
+                let httpURLResponse = response as? HTTPURLResponse, httpURLResponse.statusCode == 200,
+                let mimeType = response?.mimeType, mimeType.hasPrefix("image"),
+                let data = data, error == nil,
+                let image = UIImage(data: data)
+                else { return }
+            DispatchQueue.main.async() { () -> Void in
+                self.image = image
+            }
+            }.resume()
+    }
+    
+    func downloadedFrom(link: String, contentMode mode: UIViewContentMode = .scaleAspectFill) {
+        guard let url = URL(string: link) else { return }
+        downloadedFrom(url: url, contentMode: mode)
     }
 }

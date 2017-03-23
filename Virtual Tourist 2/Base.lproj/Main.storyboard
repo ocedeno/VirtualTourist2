@@ -89,9 +89,6 @@
                                                     <rect key="frame" x="0.0" y="0.0" width="114" height="106"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <subviews>
-                                                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="wYb-68-wQW" userLabel="Photo Cell Image View">
-                                                            <rect key="frame" x="0.0" y="0.0" width="114" height="106"/>
-                                                        </imageView>
                                                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Isa-fQ-JTy" userLabel="Loading View">
                                                             <rect key="frame" x="8" y="8" width="98" height="90"/>
                                                             <subviews>
@@ -105,6 +102,9 @@
                                                                 <constraint firstItem="7ap-uC-OrW" firstAttribute="centerX" secondItem="Isa-fQ-JTy" secondAttribute="centerX" id="Jen-ah-RcI"/>
                                                             </constraints>
                                                         </view>
+                                                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="wYb-68-wQW" userLabel="Photo Cell Image View">
+                                                            <rect key="frame" x="0.0" y="0.0" width="114" height="106"/>
+                                                        </imageView>
                                                     </subviews>
                                                 </view>
                                                 <constraints>
