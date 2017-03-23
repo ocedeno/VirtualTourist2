@@ -316,12 +316,12 @@ extension PhotoViewController : UICollectionViewDataSource
         
         if photo.imageData == nil
         {
+            photo.imageData = NSData(contentsOf: URL(string: photo.mURL!)!)
+            try! self.sharedContext.save()
             performUIUpdatesOnMain
             {
-                photo.imageData = NSData(contentsOf: URL(string: photo.mURL!)!)
                 cell.photoCellImageView.image = UIImage(data: photo.imageData! as Data)
                 cell.photoCellLoadingView.isHidden = true
-                try! self.sharedContext.save()
             }
         }
         else
